@@ -38,19 +38,7 @@ pub enum Language {
 }
 
 impl Language {
-    pub const ALL: [Self; 11] = [
-        Self::En,
-        Self::Es,
-        Self::Zh,
-        Self::Ja,
-        Self::Ko,
-        Self::Ru,
-        Self::PtBr,
-        Self::De,
-        Self::Cs,
-        Self::Fr,
-        Self::Tr,
-    ];
+    pub const ALL: [Self; 11] = [Self::En, Self::Es, Self::Zh, Self::Ja, Self::Ko, Self::Ru, Self::PtBr, Self::De, Self::Cs, Self::Fr, Self::Tr];
 
     /// The language's own name, shown in the switcher.
     pub fn name(self) -> &'static str {
@@ -121,10 +109,10 @@ impl Language {
     }
 
     pub fn formula_locale(self) -> gridcraft_engine::formula::FormulaLocale {
-        if self == Self::Es {
-            gridcraft_engine::formula::FormulaLocale::Es
-        } else {
-            gridcraft_engine::formula::FormulaLocale::En
+        match self {
+            Self::Es => gridcraft_engine::formula::FormulaLocale::Es,
+            Self::Tr => gridcraft_engine::formula::FormulaLocale::Tr,
+            _ => gridcraft_engine::formula::FormulaLocale::En,
         }
     }
 

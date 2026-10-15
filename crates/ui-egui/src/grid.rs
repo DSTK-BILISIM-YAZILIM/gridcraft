@@ -1609,7 +1609,8 @@ fn interact(app: &mut SheetApp, ui: &mut egui::Ui, resp: &egui::Response, geo: &
         } else if on_handle(p) && app.editor.is_none() {
             ctx.set_cursor_icon(CursorIcon::Crosshair);
             if app.grid.drag == Drag::None && !pointer.any_down() {
-                resp.clone().on_hover_text_at_pointer("Drag to fill cells. Drag from inside a cell to select a range.");
+                resp.clone()
+                    .on_hover_text_at_pointer(crate::i18n::current(&ctx).tr("Drag to fill cells. Drag from inside a cell to select a range."));
             }
         } else if in_cells && app.editor.is_none() && on_cur_border(p) {
             ctx.set_cursor_icon(CursorIcon::Move);
@@ -2519,21 +2520,22 @@ fn filter_menu(app: &mut SheetApp, ui: &mut egui::Ui, geo: &Geo, was_open: bool)
     let area = egui::Area::new(egui::Id::new("filter_menu")).fixed_pos(at + vec2(-180.0, 10.0)).order(egui::Order::Foreground);
     let response = area.show(ui.ctx(), |ui| {
         egui::Frame::popup(ui.style()).show(ui, |ui| {
+            let lang = crate::i18n::current(ui.ctx());
             ui.set_width(230.0);
-            if ui.button("↑  Sort Ascending").clicked() {
+            if ui.button(lang.tr("↑  Sort Ascending")).clicked() {
                 let _ = app.run("data.sortAscending", json!({"column": col_to_letters(col)}));
                 close = true;
             }
-            if ui.button("↓  Sort Descending").clicked() {
+            if ui.button(lang.tr("↓  Sort Descending")).clicked() {
                 let _ = app.run("data.sortDescending", json!({"column": col_to_letters(col)}));
                 close = true;
             }
             ui.separator();
-            ui.label(egui::RichText::new("Filter").strong());
+            ui.label(egui::RichText::new(lang.tr("Filter")).strong());
             let mut checks: Vec<(String, bool)> = ui.ctx().data_mut(|d| d.get_temp::<Vec<(String, bool)>>(key)).unwrap_or(values.clone());
             // A search narrows the list; Select All and Apply then only cover the matches.
             let mut search: String = ui.ctx().data_mut(|d| d.get_temp(search_key)).unwrap_or_default();
-            let field = ui.add(egui::TextEdit::singleline(&mut search).hint_text("Search").desired_width(f32::INFINITY));
+            let field = ui.add(egui::TextEdit::singleline(&mut search).hint_text(lang.tr("Search")).desired_width(f32::INFINITY));
             if !was_open {
                 field.request_focus();
             }
@@ -2541,7 +2543,7 @@ fn filter_menu(app: &mut SheetApp, ui: &mut egui::Ui, geo: &Geo, was_open: bool)
             let matches = |v: &str| needle.is_empty() || v.to_lowercase().contains(&needle);
             let all = checks.iter().filter(|(v, _)| matches(v)).all(|(_, b)| *b);
             let mut all_new = all;
-            let label = if needle.is_empty() { "(Select All)" } else { "(Select All Search Results)" };
+            let label = if needle.is_empty() { lang.tr("(Select All)") } else { lang.tr("(Select All Search Results)") };
             if ui.checkbox(&mut all_new, label).changed() {
                 for c in checks.iter_mut().filter(|(v, _)| matches(v)) {
                     c.1 = all_new;
@@ -2549,7 +2551,8 @@ fn filter_menu(app: &mut SheetApp, ui: &mut egui::Ui, geo: &Geo, was_open: bool)
             }
             egui::ScrollArea::vertical().max_height(220.0).show(ui, |ui| {
                 for (v, on) in checks.iter_mut().filter(|(v, _)| matches(v)) {
-                    ui.checkbox(on, v.as_str());
+                    let text = if v == "(Blanks)" { lang.tr("(Blanks)") } else { v.as_str() };
+                    ui.checkbox(on, text);
                 }
             });
             ui.ctx().data_mut(|d| {
@@ -2559,11 +2562,11 @@ fn filter_menu(app: &mut SheetApp, ui: &mut egui::Ui, geo: &Geo, was_open: bool)
             let checks: Vec<(String, bool)> = checks.iter().map(|(v, on)| (v.clone(), *on && matches(v))).collect();
             ui.separator();
             ui.horizontal(|ui| {
-                if ui.button("Clear Filter").clicked() {
+                if ui.button(lang.tr("Clear Filter")).clicked() {
                     let _ = app.run("data.filterBy", json!({"column": col_to_letters(col), "clear": true}));
                     close = true;
                 }
-                if ui.button("Apply").clicked() {
+                if ui.button(lang.tr("Apply")).clicked() {
                     let blanks = checks.iter().any(|(v, on)| v == "(Blanks)" && *on);
                     let vals: Vec<String> = checks.iter().filter(|(v, on)| *on && v != "(Blanks)").map(|(v, _)| v.clone()).collect();
                     let p = if checks.iter().all(|(_, b)| *b) {
@@ -2768,7 +2771,10 @@ pub(crate) fn paint_overlays(
     if let Some(h) = hover.and_then(|c| sh.hyperlinks.get(&c))
         && app.editor.is_none()
     {
-        let tip = h.tooltip.clone().unwrap_or_else(|| format!("{}\nClick once to follow. Click and hold to select this cell.", h.target));
+        let tip = h
+            .tooltip
+            .clone()
+            .unwrap_or_else(|| format!("{}\n{}", h.target, app.ui.language.tr("Click once to follow. Click and hold to select this cell.")));
         egui::Tooltip::always_open(ui.ctx().clone(), ui.layer_id(), egui::Id::new("link_tip"), egui::PopupAnchor::Pointer).show(|ui| {
             ui.label(tip);
         });
@@ -2966,6 +2972,7 @@ fn paint_pages(app: &mut SheetApp, p: &Painter, geo: &Geo, sh: &Sheet) {
         }
     }
     let blue = Color32::from_rgb(0x2E, 0x6F, 0xD8);
+    let page_label = app.ui.language.tr("Page");
     for (r, n) in pages {
         let rr = geo.range_rect(sh, *r);
         if !rr.intersects(c) {
@@ -2980,7 +2987,7 @@ fn paint_pages(app: &mut SheetApp, p: &Painter, geo: &Geo, sh: &Sheet) {
         p.text(
             rr.center(),
             Align2::CENTER_CENTER,
-            format!("Page {n}"),
+            format!("{page_label} {n}"),
             theme::ui_bold((rr.height().min(rr.width()) / 6.0).clamp(14.0, 72.0)),
             Color32::from_black_alpha(45),
         );

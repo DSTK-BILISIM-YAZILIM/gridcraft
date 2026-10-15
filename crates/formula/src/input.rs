@@ -9,6 +9,7 @@ pub enum FormulaLocale {
     #[default]
     En,
     Es,
+    Tr,
 }
 
 const SPANISH: &[(&str, &str)] = &[
@@ -24,28 +25,292 @@ const SPANISH: &[(&str, &str)] = &[
     ("FALSE", "FALSO"),
 ];
 
+pub const TURKISH: &[(&str, &str)] = &[
+    // Math & Trig
+    ("SUM", "TOPLA"),
+    ("SUMIF", "ETOPLA"),
+    ("SUMIFS", "ÇOKETOPLA"),
+    ("SUMPRODUCT", "TOPLA.ÇARPIM"),
+    ("SUMSQ", "TOP.KARE"),
+    ("PRODUCT", "ÇARPIM"),
+    ("QUOTIENT", "BÖLÜM"),
+    ("ABS", "MUTLAK"),
+    ("SIGN", "İŞARET"),
+    ("INT", "TAMSAYI"),
+    ("TRUNC", "NSAT"),
+    ("ROUND", "YUVARLA"),
+    ("ROUNDUP", "YUKARIYUVARLA"),
+    ("ROUNDDOWN", "AŞAĞIYUVARLA"),
+    ("MROUND", "KYUVARLA"),
+    ("CEILING", "TAVANAYUVARLA"),
+    ("CEILING.MATH", "TAVANAYUVARLA.MATEMATİK"),
+    ("FLOOR", "TABANAYUVARLA"),
+    ("FLOOR.MATH", "TABANAYUVARLA.MATEMATİK"),
+    ("EVEN", "ÇİFT"),
+    ("ODD", "TEK"),
+    ("SQRT", "KAREKÖK"),
+    ("POWER", "KUVVET"),
+    ("EXP", "ÜS"),
+    ("PI", "Pİ"),
+    ("DEGREES", "DERECE"),
+    ("RADIANS", "RADYAN"),
+    ("SIN", "SİN"),
+    ("ASIN", "ASİN"),
+    ("FACT", "FAKTÖRİYEL"),
+    ("COMBIN", "KOMBİNASYON"),
+    ("PERMUT", "PERMÜTASYON"),
+    ("GCD", "OBEB"),
+    ("LCM", "OKEK"),
+    ("RAND", "S_SAYI_ÜRET"),
+    ("RANDBETWEEN", "RASTGELEARADA"),
+    ("RANDARRAY", "RASTGELEDİZİ"),
+    ("SUBTOTAL", "ALTTOPLAM"),
+    ("AGGREGATE", "TOPLAMA"),
+    ("ROMAN", "ROMEN"),
+    ("ARABIC", "ARAP"),
+    ("BASE", "TABAN"),
+    ("DECIMAL", "ONDALIK"),
+    ("MMULT", "DÇARP"),
+    ("MDETERM", "DDETERMİNANT"),
+    ("MINVERSE", "DTERS"),
+    // Statistical
+    ("AVERAGE", "ORTALAMA"),
+    ("AVERAGEA", "ORTALAMAA"),
+    ("AVERAGEIF", "EĞERORTALAMA"),
+    ("AVERAGEIFS", "ÇOKEĞERORTALAMA"),
+    ("COUNT", "BAĞ_DEĞ_SAY"),
+    ("COUNTA", "BAĞ_DEĞ_DOLU_SAY"),
+    ("COUNTBLANK", "BOŞLUK_SAY"),
+    ("COUNTIF", "EĞERSAY"),
+    ("COUNTIFS", "ÇOKEĞERSAY"),
+    ("MIN", "MİN"),
+    ("MINA", "MİNA"),
+    ("MINIFS", "ÇOKEĞERMİN"),
+    ("MAX", "MAK"),
+    ("MAXA", "MAKA"),
+    ("MAXIFS", "ÇOKEĞERMAK"),
+    ("MEDIAN", "ORTANCA"),
+    ("MODE.SNGL", "ENÇOK_OLAN.TEK"),
+    ("MODE.MULT", "ENÇOK_OLAN.ÇOK"),
+    ("MODE", "ENÇOK_OLAN"),
+    ("LARGE", "BÜYÜK"),
+    ("SMALL", "KÜÇÜK"),
+    ("RANK.EQ", "RANK.EŞİT"),
+    ("RANK.AVG", "RANK.ORT"),
+    ("PERCENTILE.INC", "YÜZDEBİRLİK.DAHİL"),
+    ("PERCENTILE.EXC", "YÜZDEBİRLİK.HARİÇ"),
+    ("PERCENTILE", "YÜZDEBİRLİK"),
+    ("QUARTILE.INC", "DÖRTTEBİRLİK.DAHİL"),
+    ("QUARTILE.EXC", "DÖRTTEBİRLİK.HARİÇ"),
+    ("QUARTILE", "DÖRTTEBİRLİK"),
+    ("STDEV.S", "STDSAPMA.S"),
+    ("STDEV.P", "STDSAPMA.P"),
+    ("STDEV", "STDSAPMA"),
+    ("STDEVP", "STDSAPMAS"),
+    ("CORREL", "KORELASYON"),
+    ("COVARIANCE.P", "KOVARYANS.P"),
+    ("COVARIANCE.S", "KOVARYANS.S"),
+    ("SLOPE", "EĞİM"),
+    ("INTERCEPT", "KESMENOKTASI"),
+    ("FORECAST.LINEAR", "TAHMİN.DOĞRUSAL"),
+    ("FORECAST", "TAHMİN"),
+    ("FREQUENCY", "SIKLIK"),
+    ("GEOMEAN", "GEOORT"),
+    ("HARMEAN", "HARORT"),
+    ("TRIMMEAN", "KIRPORTALAMA"),
+    ("AVEDEV", "ORTSAPMA"),
+    ("DEVSQ", "SAPKARE"),
+    // Logical
+    ("IF", "EĞER"),
+    ("IFS", "ÇOKEĞER"),
+    ("IFERROR", "EĞERHATA"),
+    ("IFNA", "EĞERYOKSA"),
+    ("AND", "VE"),
+    ("OR", "YADA"),
+    ("NOT", "DEĞİL"),
+    ("XOR", "ÖZELVEYA"),
+    ("TRUE", "DOĞRU"),
+    ("FALSE", "YANLIŞ"),
+    ("SWITCH", "İLİŞKİLENDİR"),
+    // Lookup & Reference & Dynamic Arrays
+    ("VLOOKUP", "DÜŞEYARA"),
+    ("HLOOKUP", "YATAYARA"),
+    ("XLOOKUP", "ÇAPRAZARA"),
+    ("LOOKUP", "ARA"),
+    ("INDEX", "İNDİS"),
+    ("MATCH", "KAÇINCI"),
+    ("XMATCH", "ÇAPRAZKAÇINCI"),
+    ("CHOOSE", "ELEMAN"),
+    ("OFFSET", "KAYDIR"),
+    ("INDIRECT", "DOLAYLI"),
+    ("ROW", "SATIR"),
+    ("COLUMN", "SÜTUN"),
+    ("ROWS", "SATIRSAY"),
+    ("COLUMNS", "SÜTUNSAY"),
+    ("ADDRESS", "ADRES"),
+    ("AREAS", "ALANLAR"),
+    ("TRANSPOSE", "DEVRİK_DÖNÜŞÜM"),
+    ("FORMULATEXT", "FORMÜLMETNİ"),
+    ("HYPERLINK", "KÖPRÜ"),
+    ("FILTER", "FİLTRELE"),
+    ("SORT", "SIRALA"),
+    ("SORTBY", "SIRALAÖLÇÜT"),
+    ("UNIQUE", "BENZERSİZ"),
+    ("SEQUENCE", "SIRALI"),
+    ("TAKE", "AL"),
+    ("DROP", "BIRAK"),
+    ("CHOOSECOLS", "SÜTUNSEÇ"),
+    ("CHOOSEROWS", "SATIRSEÇ"),
+    ("HSTACK", "YATAYYIĞ"),
+    ("VSTACK", "DÜŞEYYIĞ"),
+    ("TOCOL", "SÜTUNA"),
+    ("TOROW", "SATIRA"),
+    ("WRAPCOLS", "SÜTUNSAR"),
+    ("WRAPROWS", "SATIRSAR"),
+    ("EXPAND", "GENİŞLET"),
+    // Text
+    ("LEFT", "SOLDAN"),
+    ("RIGHT", "SAĞDAN"),
+    ("MID", "PARÇAAL"),
+    ("LEN", "UZUNLUK"),
+    ("FIND", "BUL"),
+    ("SEARCH", "MBUL"),
+    ("REPLACE", "DEĞİŞTİR"),
+    ("SUBSTITUTE", "YERİNEKOY"),
+    ("UPPER", "BÜYÜKHARF"),
+    ("LOWER", "KÜÇÜKHARF"),
+    ("PROPER", "YAZIM.DÜZENİ"),
+    ("TRIM", "KIRP"),
+    ("CLEAN", "TEMİZ"),
+    ("CONCATENATE", "BİRLEŞTİR"),
+    ("CONCAT", "ARALIKBİRLEŞTİR"),
+    ("TEXTJOIN", "METİNBİRLEŞTİR"),
+    ("TEXT", "METNEÇEVİR"),
+    ("VALUE", "SAYIYAÇEVİR"),
+    ("NUMBERVALUE", "SAYIDEĞERİ"),
+    ("FIXED", "SAYIDÜZENLE"),
+    ("DOLLAR", "LİRA"),
+    ("EXACT", "ÖZDEŞ"),
+    ("REPT", "YİNELE"),
+    ("CHAR", "DAMGA"),
+    ("CODE", "KOD"),
+    ("UNICHAR", "UNİDAMGA"),
+    ("TEXTBEFORE", "ÖNCEKİMETİN"),
+    ("TEXTAFTER", "SONRAKİMETİN"),
+    ("TEXTSPLIT", "METİNBÖL"),
+    // Date & Time
+    ("TODAY", "BUGÜN"),
+    ("NOW", "ŞİMDİ"),
+    ("DATE", "TARİH"),
+    ("DATEVALUE", "TARİHSAYISI"),
+    ("TIME", "ZAMAN"),
+    ("TIMEVALUE", "ZAMANSAYISI"),
+    ("YEAR", "YIL"),
+    ("MONTH", "AY"),
+    ("DAY", "GÜN"),
+    ("DAYS", "GÜNSAY"),
+    ("DAYS360", "GÜN360"),
+    ("HOUR", "SAAT"),
+    ("MINUTE", "DAKİKA"),
+    ("SECOND", "SANİYE"),
+    ("WEEKDAY", "HAFTANINGÜNÜ"),
+    ("WEEKNUM", "HAFTASAY"),
+    ("ISOWEEKNUM", "ISOHAFTASAY"),
+    ("EDATE", "SERİTARİH"),
+    ("EOMONTH", "SERİAY"),
+    ("WORKDAY", "İŞGÜNÜ"),
+    ("WORKDAY.INTL", "İŞGÜNÜ.ULUSL"),
+    ("NETWORKDAYS", "TAMİŞGÜNÜ"),
+    ("NETWORKDAYS.INTL", "TAMİŞGÜNÜ.ULUSL"),
+    ("DATEDIF", "ETARİHLİ"),
+    ("YEARFRAC", "YILORAN"),
+    // Financial
+    ("PMT", "DEVRESEL_ÖDEME"),
+    ("IPMT", "FAİZ_ÖDEMESİ"),
+    ("PPMT", "ANA_PARA_ÖDEMESİ"),
+    ("PV", "BD"),
+    ("FV", "GD"),
+    ("NPV", "NBD"),
+    ("XNPV", "ANBD"),
+    ("IRR", "İÇ_VERİM_ORANI"),
+    ("XIRR", "AİÇVERİMORANI"),
+    ("MIRR", "D_İÇ_VERİM_ORANI"),
+    ("RATE", "FAİZ_ORANI"),
+    ("NPER", "TAKSİT_SAYISI"),
+    ("EFFECT", "ETKİN"),
+    ("NOMINAL", "NOMİNAL"),
+    ("SLN", "DA"),
+    ("SYD", "YAT"),
+    ("DB", "AZALANBAKİYE"),
+    ("DDB", "ÇİFTAZALANBAKİYE"),
+    // Information & Database
+    ("ISBLANK", "EBOŞSA"),
+    ("ISERROR", "EHATALIYSA"),
+    ("ISERR", "EHATA"),
+    ("ISNA", "EYOKSA"),
+    ("ISNUMBER", "ESAYIYSA"),
+    ("ISTEXT", "EMETİNSE"),
+    ("ISNONTEXT", "EMETİNDEĞİLSE"),
+    ("ISLOGICAL", "EMANTIKSALSA"),
+    ("ISREF", "EREFERANSSA"),
+    ("ISFORMULA", "EFORMÜLSE"),
+    ("ISEVEN", "ÇİFTMİ"),
+    ("ISODD", "TEKMİ"),
+    ("N", "S"),
+    ("NA", "YOKSAY"),
+    ("TYPE", "TÜR"),
+    ("ERROR.TYPE", "HATA.TİPİ"),
+    ("CELL", "HÜCRE"),
+    ("SHEET", "SAYFA"),
+    ("SHEETS", "SAYFALAR"),
+    ("DSUM", "VSEÇTOPLA"),
+    ("DAVERAGE", "VSEÇORT"),
+    ("DCOUNT", "VSEÇSAY"),
+    ("DCOUNTA", "VSEÇSAYDOLU"),
+    ("DMIN", "VSEÇMİN"),
+    ("DMAX", "VSEÇMAK"),
+    ("DGET", "VSEÇAL"),
+    ("DPRODUCT", "VSEÇÇARP"),
+];
+
+fn fold_tr_char(c: char) -> char {
+    match c {
+        'i' | 'İ' | 'ı' | 'I' => 'I',
+        'ğ' | 'Ğ' => 'Ğ',
+        'ü' | 'Ü' => 'Ü',
+        'ş' | 'Ş' => 'Ş',
+        'ö' | 'Ö' => 'Ö',
+        'ç' | 'Ç' => 'Ç',
+        _ => c.to_ascii_uppercase(),
+    }
+}
+
+pub fn eq_tr_ignore_case(a: &str, b: &str) -> bool {
+    a.chars().filter(|&c| c != '\u{0307}').map(fold_tr_char).eq(b.chars().filter(|&c| c != '\u{0307}').map(fold_tr_char))
+}
+
 impl FormulaLocale {
     pub fn list_separator(self) -> char {
-        if self == Self::Es { ';' } else { ',' }
+        if matches!(self, Self::Es | Self::Tr) { ';' } else { ',' }
     }
     pub fn decimal_separator(self) -> char {
-        if self == Self::Es { ',' } else { '.' }
+        if matches!(self, Self::Es | Self::Tr) { ',' } else { '.' }
     }
     pub fn array_column_separator(self) -> char {
-        if self == Self::Es { '\\' } else { ',' }
+        if matches!(self, Self::Es | Self::Tr) { '\\' } else { ',' }
     }
     pub fn function_name(self, canonical: &str) -> &str {
-        if self == Self::Es {
-            SPANISH.iter().find(|(en, _)| en.eq_ignore_ascii_case(canonical)).map(|(_, es)| *es).unwrap_or(canonical)
-        } else {
-            canonical
+        match self {
+            Self::En => canonical,
+            Self::Es => SPANISH.iter().find(|(en, _)| en.eq_ignore_ascii_case(canonical)).map(|(_, es)| *es).unwrap_or(canonical),
+            Self::Tr => TURKISH.iter().find(|(en, _)| en.eq_ignore_ascii_case(canonical)).map(|(_, tr)| *tr).unwrap_or(canonical),
         }
     }
     pub fn canonical_name(self, localized: &str) -> &str {
-        if self == Self::Es {
-            SPANISH.iter().find(|(_, es)| es.eq_ignore_ascii_case(localized)).map(|(en, _)| *en).unwrap_or(localized)
-        } else {
-            localized
+        match self {
+            Self::En => localized,
+            Self::Es => SPANISH.iter().find(|(_, es)| es.eq_ignore_ascii_case(localized)).map(|(en, _)| *en).unwrap_or(localized),
+            Self::Tr => TURKISH.iter().find(|(_, tr)| eq_tr_ignore_case(tr, localized)).map(|(en, _)| *en).unwrap_or(localized),
         }
     }
 }
@@ -54,8 +319,8 @@ impl FormulaLocale {
 /// LET/LAMBDA bindings take precedence over aliases. File and API syntax uses [`crate::parse`].
 pub fn parse_input(src: &str, locale: FormulaLocale, known_name: impl Fn(&str) -> bool) -> Result<Expr, ParseError> {
     let mut expr = parser::parse_syntax(src, locale)?;
-    if locale == FormulaLocale::Es {
-        normalize(&mut expr, &known_name, &mut Vec::new(), 0, false)?;
+    if locale != FormulaLocale::En {
+        normalize(&mut expr, locale, &known_name, &mut Vec::new(), 0, false)?;
     }
     Ok(expr)
 }
@@ -89,7 +354,7 @@ pub fn print_input(expr: &Expr, locale: FormulaLocale, known_name: impl Fn(&str)
         return Ok(crate::print(expr));
     }
     let mut expr = expr.clone();
-    normalize(&mut expr, &known_name, &mut Vec::new(), 0, true)?;
+    normalize(&mut expr, locale, &known_name, &mut Vec::new(), 0, true)?;
     let canonical = crate::print(&expr);
     let tokens = crate::lexer::tokenize(&canonical).map_err(|e| ParseError { msg: e.msg, pos: e.pos })?;
     let mut out = String::new();
@@ -114,30 +379,73 @@ pub fn print_input(expr: &Expr, locale: FormulaLocale, known_name: impl Fn(&str)
     Ok(out)
 }
 
-pub(crate) fn boolean_alias(name: &str) -> Option<bool> {
-    if name.eq_ignore_ascii_case("VERDADERO") {
-        Some(true)
-    } else if name.eq_ignore_ascii_case("FALSO") {
-        Some(false)
-    } else {
-        None
+pub(crate) fn boolean_alias(name: &str, locale: FormulaLocale) -> Option<bool> {
+    match locale {
+        FormulaLocale::En => None,
+        FormulaLocale::Es => {
+            if name.eq_ignore_ascii_case("VERDADERO") {
+                Some(true)
+            } else if name.eq_ignore_ascii_case("FALSO") {
+                Some(false)
+            } else {
+                None
+            }
+        }
+        FormulaLocale::Tr => {
+            if eq_tr_ignore_case(name, "DOĞRU") {
+                Some(true)
+            } else if eq_tr_ignore_case(name, "YANLIŞ") {
+                Some(false)
+            } else {
+                None
+            }
+        }
     }
 }
 
-fn normalize(expr: &mut Expr, known_name: &impl Fn(&str) -> bool, bindings: &mut Vec<String>, depth: usize, display: bool) -> Result<(), ParseError> {
+fn normalize(
+    expr: &mut Expr,
+    locale: FormulaLocale,
+    known_name: &impl Fn(&str) -> bool,
+    bindings: &mut Vec<String>,
+    depth: usize,
+    display: bool,
+) -> Result<(), ParseError> {
     if depth > parser::MAX_DEPTH {
         return Err(ParseError { msg: "formula is nested too deeply".into(), pos: 0 });
     }
-    let bound = |name: &str, bindings: &[String]| bindings.iter().rev().any(|n| n.eq_ignore_ascii_case(name)) || known_name(name);
+    let bound = |name: &str, bindings: &[String]| bindings.iter().rev().any(|n| eq_tr_ignore_case(n, name)) || known_name(name);
     match expr {
         Expr::Bool(value) if display => {
-            let alias = if *value { "VERDADERO" } else { "FALSO" };
+            let alias = match locale {
+                FormulaLocale::En => {
+                    if *value {
+                        "TRUE"
+                    } else {
+                        "FALSE"
+                    }
+                }
+                FormulaLocale::Es => {
+                    if *value {
+                        "VERDADERO"
+                    } else {
+                        "FALSO"
+                    }
+                }
+                FormulaLocale::Tr => {
+                    if *value {
+                        "DOĞRU"
+                    } else {
+                        "YANLIŞ"
+                    }
+                }
+            };
             if !bound(alias, bindings) {
                 *expr = Expr::Name(alias.into());
             }
         }
         Expr::Name(name) if !display && !bound(name, bindings) => {
-            if let Some(value) = boolean_alias(name) {
+            if let Some(value) = boolean_alias(name, locale) {
                 *expr = Expr::Bool(value);
             }
         }
@@ -147,13 +455,13 @@ fn normalize(expr: &mut Expr, known_name: &impl Fn(&str) -> bool, bindings: &mut
                 for pair in pairs.chunks_mut(2) {
                     if let [declaration, value] = pair {
                         // The new name is not in scope in its own value expression.
-                        normalize(value, known_name, bindings, depth + 1, display)?;
+                        normalize(value, locale, known_name, bindings, depth + 1, display)?;
                         if let Expr::Name(name) = declaration {
                             bindings.push(name.clone());
                         }
                     }
                 }
-                normalize(body, known_name, bindings, depth + 1, display)?;
+                normalize(body, locale, known_name, bindings, depth + 1, display)?;
             }
             bindings.truncate(saved);
         }
@@ -165,34 +473,34 @@ fn normalize(expr: &mut Expr, known_name: &impl Fn(&str) -> bool, bindings: &mut
                         bindings.push(name.clone());
                     }
                 }
-                normalize(body, known_name, bindings, depth + 1, display)?;
+                normalize(body, locale, known_name, bindings, depth + 1, display)?;
             }
             bindings.truncate(saved);
         }
         Expr::Call(name, args) => {
-            let alias = if display { FormulaLocale::Es.function_name(name) } else { FormulaLocale::Es.canonical_name(name) };
+            let alias = if display { locale.function_name(name) } else { locale.canonical_name(name) };
             if !bound(name, bindings) && (!display || !bound(alias, bindings)) {
                 *name = alias.to_string();
             }
             for arg in args {
-                normalize(arg, known_name, bindings, depth + 1, display)?;
+                normalize(arg, locale, known_name, bindings, depth + 1, display)?;
             }
         }
         Expr::Invoke(callee, args) => {
-            normalize(callee, known_name, bindings, depth + 1, display)?;
+            normalize(callee, locale, known_name, bindings, depth + 1, display)?;
             for arg in args {
-                normalize(arg, known_name, bindings, depth + 1, display)?;
+                normalize(arg, locale, known_name, bindings, depth + 1, display)?;
             }
         }
-        Expr::Unary(_, child) | Expr::Paren(child) => normalize(child, known_name, bindings, depth + 1, display)?,
+        Expr::Unary(_, child) | Expr::Paren(child) => normalize(child, locale, known_name, bindings, depth + 1, display)?,
         Expr::Binary(_, left, right) => {
-            normalize(left, known_name, bindings, depth + 1, display)?;
-            normalize(right, known_name, bindings, depth + 1, display)?;
+            normalize(left, locale, known_name, bindings, depth + 1, display)?;
+            normalize(right, locale, known_name, bindings, depth + 1, display)?;
         }
         Expr::Array(rows) if display => {
             for row in rows {
                 for child in row {
-                    normalize(child, known_name, bindings, depth + 1, display)?;
+                    normalize(child, locale, known_name, bindings, depth + 1, display)?;
                 }
             }
         }
