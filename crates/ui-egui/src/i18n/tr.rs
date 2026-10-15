@@ -3,6 +3,14 @@
 
 pub(super) fn translate(text: &str) -> Option<&'static str> {
     Some(match text {
+        "Text Box" => "Metin Kutusu",
+        "Rectangle" => "Dikdörtgen",
+        "Rounded Rectangle" => "Yuvarlatılmış Dikdörtgen",
+        "Oval" => "Elips",
+        "Triangle" => "Üçgen",
+        "Line" => "Çizgi",
+        "Arrow" => "Ok",
+        "Slicer" => "Dilimleyici",
         "Paste" => "Yapıştır",
         "Paste Values" => "Değerleri Yapıştır",
         "Paste Formulas" => "Formülleri Yapıştır",
