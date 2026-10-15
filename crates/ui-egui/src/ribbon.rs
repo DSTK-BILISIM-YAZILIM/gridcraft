@@ -52,7 +52,7 @@ pub fn title_bar(app: &mut SheetApp, ui: &mut Ui) {
         ui.horizontal_centered(|ui| {
             ui.add_space(TITLE_LEFT_PAD);
             // AutoSave toggle (saves after each change when the workbook has a file).
-            ui.label(egui::RichText::new("AutoSave").font(theme::ui_font(12.5)).color(t.text_dim));
+            ui.label(egui::RichText::new(app.ui.language.tr("AutoSave")).font(theme::ui_font(12.5)).color(t.text_dim));
             let on = app.grid.autosave();
             let (r, resp) = ui.allocate_exact_size(vec2(30.0, 16.0), Sense::click());
             ui.painter().rect_filled(r, 8.0, if on { t.accent } else { Color32::TRANSPARENT });
@@ -1412,7 +1412,7 @@ fn insert(app: &mut SheetApp, ui: &mut Ui) {
                     ui.painter().rect_filled(r, 4.0, Tokens::get(ui.ctx()).hover);
                 }
                 icons::paint(ui.painter(), r.shrink(6.0), *icon, Tokens::get(ui.ctx()).text);
-                if resp.on_hover_text(*name).clicked() {
+                if resp.on_hover_text(app.ui.language.tr(*name)).clicked() {
                     act(app, "insert.icons", json!({"name": name}));
                     ui.close();
                 }
@@ -1462,7 +1462,7 @@ fn insert(app: &mut SheetApp, ui: &mut Ui) {
                 let forced_c = invoke(app, cid);
                 egui::Popup::menu(&r).open_memory(popup_command(forced_c, r.clicked())).show(|ui| {
                     for (label, k, s) in &subs {
-                        if ui.button(*label).clicked() {
+                        if ui.button(app.ui.language.tr(*label)).clicked() {
                             act(app, "insert.chart", json!({"type": k, "subtype": s}));
                         }
                     }
@@ -1498,7 +1498,7 @@ fn insert(app: &mut SheetApp, ui: &mut Ui) {
                 let forced_c = invoke(app, cid);
                 egui::Popup::menu(&r).open_memory(popup_command(forced_c, r.clicked())).show(|ui| {
                     for (label, k, s) in &subs {
-                        if ui.button(*label).clicked() {
+                        if ui.button(app.ui.language.tr(*label)).clicked() {
                             act(app, "insert.chart", json!({"type": k, "subtype": s}));
                         }
                     }
@@ -1507,7 +1507,7 @@ fn insert(app: &mut SheetApp, ui: &mut Ui) {
         });
     });
     sep(ui);
-    if big_button(ui, Icon::Filter, "Slicer", "Insert a slicer to filter a table", false).clicked() {
+    if big_button(ui, Icon::Filter, app.ui.language.tr("Slicer"), app.ui.language.tr("Insert a slicer to filter a table"), false).clicked() {
         act(app, "insert.slicer", json!({}));
     }
     sep(ui);
@@ -1522,7 +1522,7 @@ fn insert(app: &mut SheetApp, ui: &mut Ui) {
     });
     sep(ui);
     // Cell Controls.
-    if big_button(ui, Icon::Checkbox, "Checkbox", "Insert checkboxes in the selected cells", false).clicked() {
+    if big_button(ui, Icon::Checkbox, app.ui.language.tr("Checkbox"), app.ui.language.tr("Insert checkboxes in the selected cells"), false).clicked() {
         act(app, "insert.checkbox", json!({}));
     }
     sep(ui);
@@ -1575,7 +1575,7 @@ fn draw(app: &mut SheetApp, ui: &mut Ui) {
     sep(ui);
     for (label, color) in [("Pen\nBlue", "#1F5FC9"), ("Pen\nBlack", "#000000"), ("Pen\nRed", "#D13B2F"), ("Highlighter", "#F2E33A")] {
         let on = tool == "pen" && app.session.draw_color.eq_ignore_ascii_case(color);
-        let r = big_button(ui, Icon::Pen, label, "Draw with ink", false);
+        let r = big_button(ui, Icon::Pen, app.ui.language.tr(label), app.ui.language.tr("Draw with ink"), false);
         if on {
             ui.painter().rect_stroke(r.rect, 5.0, Stroke::new(2.0, Tokens::get(ui.ctx()).accent), StrokeKind::Inside);
         }
@@ -1648,7 +1648,7 @@ fn page_layout(app: &mut SheetApp, ui: &mut Ui) {
     control_keytip(app, ui, &s, "pageLayout.size");
     egui::Popup::menu(&s).show(|ui| {
         for p in ["Letter", "Legal", "Tabloid", "Executive", "A3", "A4", "A5"] {
-            if ui.button(p).clicked() {
+            if ui.button(app.ui.language.tr(p)).clicked() {
                 act(app, "pageLayout.size", json!({"paper": p}));
             }
         }
@@ -2068,7 +2068,7 @@ fn review(app: &mut SheetApp, ui: &mut Ui) {
     });
     sep(ui);
     let protected = app.session.active().and_then(|d| d.wb.active().map(|s| s.is_protected())).unwrap_or(false);
-    let __k = big_button(ui, Icon::Lock, if protected { "Unprotect\nSheet" } else { "Protect\nSheet" }, "Protect Sheet", false);
+    let __k = big_button(ui, Icon::Lock, if protected { app.ui.language.tr("Unprotect\nSheet") } else { app.ui.language.tr("Protect\nSheet") }, app.ui.language.tr("Protect Sheet"), false);
     control_keytip(app, ui, &__k, "dialog:protectSheet");
     if __k.clicked() {
         if protected {
@@ -2279,7 +2279,7 @@ fn table_design(app: &mut SheetApp, ui: &mut Ui) {
         act(app, "table.convertToRange", json!({"table": tname}));
     }
     sep(ui);
-    if big_button(ui, Icon::Filter, "Insert\nSlicer", "Insert Slicer", false).clicked() {
+    if big_button(ui, Icon::Filter, app.ui.language.tr("Insert\nSlicer"), app.ui.language.tr("Insert Slicer"), false).clicked() {
         act(app, "table.insertSlicer", json!({"table": tname}));
     }
     sep(ui);
