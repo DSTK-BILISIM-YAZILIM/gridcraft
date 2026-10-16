@@ -381,6 +381,7 @@ impl Default for Calc {
 
 struct PassHost<'a> {
     wb: &'a Workbook,
+    graph: Option<&'a Graph>,
     exprs: &'a HashMap<Key, std::sync::Arc<Expr>>,
     results: HashMap<Key, Value>,
     pending: HashSet<Key>,
@@ -390,6 +391,12 @@ struct PassHost<'a> {
     /// Used range per sheet: the workbook doesn't change during a pass, and working it out walks
     /// every row, so once per sheet rather than once per range read.
     used: HashMap<usize, Option<RangeRef>>,
+    /// Cached evaluated range arrays within a single non-iterative pass: `(sheet, range) -> (spills_len, array)`.
+    area_cache: HashMap<(usize, RangeRef), (usize, std::sync::Arc<Array>)>,
+    area_cache_cells: usize,
+    /// Cached O(1) exact lookup indices for 1-D ranges within a non-iterative pass.
+    match_cache: HashMap<(usize, RangeRef), (usize, ExactIndex)>,
+    match_cache_cells: usize,
     rng: &'a mut u64,
     now: f64,
     cycle: bool,
@@ -410,16 +417,72 @@ struct PassHost<'a> {
     taint: bool,
 }
 
+#[derive(Default)]
+struct ExactIndex {
+    nums: HashMap<u64, u32>,
+    texts: HashMap<String, u32>,
+    bools: [Option<u32>; 2],
+}
+
+impl ExactIndex {
+    fn from_array(arr: &Array) -> Self {
+        let mut nums = HashMap::default();
+        let mut texts = HashMap::default();
+        let mut bools = [None, None];
+        for (i, v) in arr.data.iter().enumerate() {
+            let pos = i as u32 + 1;
+            match v {
+                Value::Number(n) => {
+                    nums.entry((*n + 0.0).to_bits()).or_insert(pos);
+                }
+                Value::Text(s) => {
+                    let k = if s.is_ascii() { s.to_ascii_lowercase() } else { s.to_lowercase() };
+                    texts.entry(k).or_insert(pos);
+                }
+                Value::Bool(b) => {
+                    let slot = &mut bools[usize::from(*b)];
+                    if slot.is_none() {
+                        *slot = Some(pos);
+                    }
+                }
+                _ => {}
+            }
+        }
+        Self { nums, texts, bools }
+    }
+
+    fn get(&self, key: &Value) -> Option<u32> {
+        match key {
+            Value::Empty => self.nums.get(&(0.0f64).to_bits()).copied(),
+            Value::Number(n) => self.nums.get(&(*n + 0.0).to_bits()).copied(),
+            Value::Text(s) => {
+                if s.is_ascii() {
+                    self.texts.get(&s.to_ascii_lowercase()).copied()
+                } else {
+                    self.texts.get(&s.to_lowercase()).copied()
+                }
+            }
+            Value::Bool(b) => self.bools[usize::from(*b)],
+            _ => None,
+        }
+    }
+}
+
 impl<'a> PassHost<'a> {
     fn new(wb: &'a Workbook, exprs: &'a HashMap<Key, std::sync::Arc<Expr>>, rng: &'a mut u64, now: f64) -> Self {
         PassHost {
             wb,
+            graph: None,
             exprs,
             results: HashMap::with_capacity_and_hasher(exprs.len(), Default::default()),
             pending: exprs.keys().copied().collect(),
             in_progress: HashSet::default(),
             spills: HashMap::default(),
             used: HashMap::default(),
+            area_cache: HashMap::default(),
+            area_cache_cells: 0,
+            match_cache: HashMap::default(),
+            match_cache_cells: 0,
             rng,
             now,
             cycle: false,
@@ -457,7 +520,97 @@ fn spill_blocked(host: &PassHost<'_>, (sheet, anchor): Key, a: &Array) -> bool {
 }
 
 impl PassHost<'_> {
+    /// Iteratively evaluates uncomputed static precedents of `root` on a heap stack so deep
+    /// formula chains never overflow the call stack or trigger false `#CIRC!` errors.
+    fn precompute_precedents(&mut self, root: Key) {
+        let Some(graph) = self.graph else { return };
+        let Some(root_node) = graph.nodes.get(&root) else { return };
+        let has_uncomputed = root_node.areas.iter().any(|a| {
+            if a.range.is_single() {
+                let p = (a.sheet, a.range.start);
+                self.pending.contains(&p) && !self.results.contains_key(&p) && !self.in_progress.contains(&p)
+            } else {
+                a.range.count() <= 64
+                    && self.wb.sheet(a.sheet).is_some_and(|sh| {
+                        sh.cells.iter_range(a.range).any(|(c, cell)| {
+                            cell.formula.is_some() && {
+                                let p = (a.sheet, c);
+                                self.pending.contains(&p) && !self.results.contains_key(&p) && !self.in_progress.contains(&p)
+                            }
+                        })
+                    })
+            }
+        });
+        if !has_uncomputed {
+            return;
+        }
+        let mut stack: Vec<(Key, bool)> = vec![(root, false)];
+        let mut on_path: HashSet<Key> = HashSet::default();
+        let mut cycle_seen = false;
+        while let Some((k, expanded)) = stack.pop() {
+            if self.results.contains_key(&k) || !self.pending.contains(&k) || self.in_progress.contains(&k) {
+                on_path.remove(&k);
+                continue;
+            }
+            if expanded {
+                on_path.remove(&k);
+                if k != root && !cycle_seen {
+                    self.compute_one(k);
+                }
+                continue;
+            }
+            let Some(node) = graph.nodes.get(&k) else {
+                if k != root && !cycle_seen {
+                    self.compute_one(k);
+                }
+                continue;
+            };
+            on_path.insert(k);
+            stack.push((k, true));
+            for area in node.areas.iter().rev() {
+                if area.range.is_single() {
+                    let p = (area.sheet, area.range.start);
+                    if on_path.contains(&p) || self.in_progress.contains(&p) {
+                        cycle_seen = true;
+                    } else if self.pending.contains(&p) && !self.results.contains_key(&p) {
+                        stack.push((p, false));
+                    }
+                } else if area.range.count() <= 64
+                    && let Some(sh) = self.wb.sheet(area.sheet)
+                {
+                    for (c, cell) in sh.cells.iter_range(area.range) {
+                        if cell.formula.is_some() {
+                            let p = (area.sheet, c);
+                            if on_path.contains(&p) || self.in_progress.contains(&p) {
+                                cycle_seen = true;
+                            } else if self.pending.contains(&p) && !self.results.contains_key(&p) {
+                                stack.push((p, false));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     fn compute(&mut self, k: Key) -> Value {
+        if let Some(v) = self.results.get(&k) {
+            let v = v.clone();
+            if self.iterate && self.tainted.contains(&k) {
+                self.taint = true;
+            }
+            return v;
+        }
+        if !self.iterate && !self.in_progress.contains(&k) && self.depth == 32 {
+            self.precompute_precedents(k);
+            if let Some(v) = self.results.get(&k) {
+                return v.clone();
+            }
+        }
+        self.compute_one(k)
+    }
+
+    fn compute_one(&mut self, k: Key) -> Value {
         if let Some(v) = self.results.get(&k) {
             let v = v.clone();
             if self.iterate && self.tainted.contains(&k) {
@@ -739,6 +892,53 @@ impl Host for PassHost<'_> {
         }
         out
     }
+    fn area_array(&mut self, sheet: usize, range: RangeRef) -> Option<std::sync::Arc<Array>> {
+        if !self.iterate
+            && let Some((spills_len, arr)) = self.area_cache.get(&(sheet, range))
+            && *spills_len == self.spills.len()
+        {
+            return Some(std::sync::Arc::clone(arr));
+        }
+        let (h, w) = (range.height() as usize, range.width() as usize);
+        let data = self.range_values(sheet, range);
+        let arr = std::sync::Arc::new(Array::new(h, w, data)?);
+        let cells = h.saturating_mul(w);
+        if !self.iterate && cells >= 16 && self.area_cache_cells.saturating_add(cells) <= 16_000_000 {
+            self.area_cache_cells += cells;
+            self.area_cache.insert((sheet, range), (self.spills.len(), std::sync::Arc::clone(&arr)));
+        }
+        Some(arr)
+    }
+    fn exact_match(&mut self, sheet: usize, range: RangeRef, key: &Value) -> Option<Option<u32>> {
+        if self.iterate || (range.width() != 1 && range.height() != 1) {
+            return None;
+        }
+        let len = range.height().max(range.width()) as usize;
+        if len < 16 {
+            return None;
+        }
+        if let Value::Text(s) = key
+            && s.contains(['*', '?', '~'])
+        {
+            return None;
+        }
+        if !matches!(key, Value::Empty | Value::Number(_) | Value::Text(_) | Value::Bool(_)) {
+            return None;
+        }
+        if let Some((spills_len, idx)) = self.match_cache.get(&(sheet, range))
+            && *spills_len == self.spills.len()
+        {
+            return Some(idx.get(key));
+        }
+        let arr = self.area_array(sheet, range)?;
+        let idx = ExactIndex::from_array(&arr);
+        let res = idx.get(key);
+        if self.match_cache_cells.saturating_add(len) <= 8_000_000 {
+            self.match_cache_cells += len;
+            self.match_cache.insert((sheet, range), (self.spills.len(), idx));
+        }
+        Some(res)
+    }
     fn visit_range(&mut self, sheet: usize, range: RangeRef, f: &mut dyn FnMut(&Value) -> bool) -> bool {
         let wb = self.wb;
         let Some(sh) = wb.sheet(sheet) else { return false };
@@ -799,7 +999,7 @@ impl Calc {
         for (si, sheet) in wb.sheets.iter().enumerate() {
             for (c, cell) in sheet.cells.iter() {
                 if let Some(f) = &cell.formula
-                    && let Some(e) = f.expr()
+                    && let Some(e) = f.expr_arc()
                 {
                     let (areas, dynamic) = precedents(wb, si, &e);
                     self.graph.insert((si, c), Node { areas, dynamic });
@@ -831,7 +1031,7 @@ impl Calc {
         let mut cleared: Vec<(usize, RangeRef)> = Vec::new();
         for &k in changed {
             let formula = wb.sheet(k.0).and_then(|s| s.cell(k.1)).and_then(|c| c.formula.clone());
-            match formula.and_then(|f| f.expr()) {
+            match formula.and_then(|f| f.expr_arc()) {
                 Some(e) => {
                     let (areas, dynamic) = precedents(wb, k.0, &e);
                     self.graph.insert(k, Node { areas, dynamic });
@@ -967,6 +1167,7 @@ impl Calc {
             let tp = prof_now();
             let (results, spills, cycles) = {
                 let mut host = PassHost::new(wb, &exprs, &mut rng, now);
+                host.graph = Some(&self.graph);
                 host.iterate = wb.calc.iterative;
                 for k in &dirty {
                     host.compute(*k);
@@ -1089,7 +1290,7 @@ pub fn now_serial() -> f64 {
 /// validation, Evaluate Formula, Name Manager previews, the CLI `eval`).
 pub fn evaluate(wb: &Workbook, sheet: usize, at: CellRef, formula: &str) -> Value {
     let body = formula.strip_prefix('=').unwrap_or(formula);
-    let Ok(expr) = gridcraft_formula::parse(body) else { return Value::Error(CellError::Name) };
+    let Ok(expr) = gridcraft_formula::parse_any(body) else { return Value::Error(CellError::Name) };
     evaluate_expr(wb, sheet, at, &expr)
 }
 
@@ -1344,5 +1545,26 @@ pub(crate) mod tests {
             true
         })
         .then_some(seen)
+    }
+
+    #[test]
+    fn deep_reverse_chain_and_cross_locale_formulas() {
+        let mut wb = Workbook::new();
+        let depth = 5_000u32;
+        if let Some(sh) = wb.sheet_mut(0) {
+            for r in 0..depth {
+                let f = Formula::new(&format!("=A{}+1", r + 2));
+                sh.cells.set(CellRef::new(r, 0), Cell::formula(f));
+            }
+            sh.cells.set(CellRef::new(depth, 0), Cell::value(Value::Number(1.0)));
+            // Turkish formula on the same sheet, evaluated regardless of active UI locale.
+            sh.cells.set(CellRef::new(0, 1), Cell::formula(Formula::new("=TOPLA(A5000:A5001)+EĞER(DOĞRU;1,5;0)")));
+        }
+        let mut calc = Calc::new();
+        calc.recalc_all(&mut wb);
+        let sh = wb.sheet(0).unwrap();
+        assert_eq!(sh.value(CellRef::new(0, 0)), Value::Number(f64::from(depth + 1)));
+        assert_eq!(sh.value(CellRef::new(0, 1)), Value::Number(4.5));
+        assert!(calc.circular.is_empty());
     }
 }

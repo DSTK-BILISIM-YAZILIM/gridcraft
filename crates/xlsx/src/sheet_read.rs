@@ -57,6 +57,7 @@ pub fn read_sheet(cx: &mut Ctx<'_>, part: &str, name: &str) -> Result<Sheet, IoE
     if st.dropped > 0 {
         cx.warn(format!("sheet \"{name}\": {} cells or rows outside the 1,048,576 × 16,384 grid were dropped", st.dropped));
     }
+    cx.sheet_scan = crate::passthrough::maybe_scan_sheet(&bytes, &rels);
     drop(bytes);
 
     let mut fit_to_page = false;
@@ -454,15 +455,14 @@ fn read_cell(cx: &mut Ctx<'_>, sheet: &mut Sheet, st: &mut RowState, c: &El, pos
 }
 
 fn read_formula(cx: &mut Ctx<'_>, st: &mut RowState, f: &El, pos: CellRef, dynamic: bool) -> Option<Formula> {
-    let model = from_file(f.text.trim());
-    let text = model.as_str();
+    let raw = f.text.trim();
     match f.attr("t").unwrap_or("normal") {
         "shared" => {
             let si = f.attr_u32("si")?;
-            if !text.is_empty() {
-                let expr = gridcraft_formula::parse(text).ok();
-                st.shared.insert(si, Shared { anchor: pos, expr, text: text.to_string() });
-                Some(Formula::new(text))
+            if !raw.is_empty() {
+                let fm = crate::fmla::from_file_formula(raw);
+                st.shared.insert(si, Shared { anchor: pos, expr: fm.expr.as_deref().cloned(), text: fm.text.clone() });
+                Some(fm)
             } else {
                 let Some(sh) = st.shared.get(&si) else {
                     cx.warn("a shared formula refers to a missing master cell; kept the cached value");
@@ -474,15 +474,15 @@ fn read_formula(cx: &mut Ctx<'_>, st: &mut RowState, f: &El, pos: CellRef, dynam
                         let dc = pos.col as i64 - sh.anchor.col as i64;
                         Formula::from_expr(gridcraft_formula::adjust::shift_relative(e.clone(), dr, dc))
                     }
-                    None => Formula::new(&sh.text),
+                    None => Formula { text: sh.text.clone(), expr: None, array: None },
                 })
             }
         }
         "array" => {
-            if text.is_empty() {
+            if raw.is_empty() {
                 return None;
             }
-            let mut fm = Formula::new(text);
+            let mut fm = crate::fmla::from_file_formula(raw);
             let range = f.attr("ref").and_then(RangeRef::parse).unwrap_or(RangeRef::cell(pos));
             if !range.is_single() {
                 st.dynamic.push(range);
@@ -497,10 +497,10 @@ fn read_formula(cx: &mut Ctx<'_>, st: &mut RowState, f: &El, pos: CellRef, dynam
             None
         }
         _ => {
-            if text.is_empty() {
+            if raw.is_empty() {
                 None
             } else {
-                Some(Formula::new(text))
+                Some(crate::fmla::from_file_formula(raw))
             }
         }
     }

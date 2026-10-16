@@ -17,7 +17,7 @@ pub const MAX_CELLS: u64 = 16_000_000;
 /// reserved for data to come such as `$A$2:$A$50000`) stop at the sheet's used range, so that
 /// formulas over them stay fast.
 const FULL_SIZE_CELLS: u64 = 16_384;
-const MAX_DEPTH: usize = 400;
+const MAX_DEPTH: usize = 1024;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct Area {
@@ -65,6 +65,17 @@ pub trait Host {
     /// Values of a block, row-major. Hosts can override with a sparse fast path.
     fn range_values(&mut self, sheet: usize, range: RangeRef) -> Vec<Value> {
         range.iter().map(|c| self.cell_value(sheet, c)).collect()
+    }
+    /// Evaluates a block as a shared [`Array`]. Hosts can cache repeated range reads within a pass.
+    fn area_array(&mut self, sheet: usize, range: RangeRef) -> Option<Arc<Array>> {
+        let (h, w) = (range.height() as usize, range.width() as usize);
+        let data = self.range_values(sheet, range);
+        Array::new(h, w, data).map(Arc::new)
+    }
+    /// O(1) cached exact forward match (1-based index) over a 1-D range reference when supported by
+    /// the host (`None` when the host declines, e.g. wildcard text or 2-D range).
+    fn exact_match(&mut self, _sheet: usize, _range: RangeRef, _key: &Value) -> Option<Option<u32>> {
+        None
     }
     /// The sheet's used range (`Sheet::used_range`, which walks every stored row). Hosts that
     /// keep the workbook unchanged while evaluating can remember it.
@@ -155,8 +166,7 @@ impl<'h> Evaluator<'h> {
         if (h as u64) * (w as u64) > MAX_CELLS {
             return Value::Error(CellError::Num);
         }
-        let data = self.host.range_values(a.sheet, range);
-        Array::new(h, w, data).map(Value::from).unwrap_or(Value::Error(CellError::Value))
+        self.host.area_array(a.sheet, range).map(Value::Array).unwrap_or(Value::Error(CellError::Value))
     }
 
     /// Trims the bottom/right of an area to the sheet's used range (keeps the top-left so
@@ -247,7 +257,7 @@ impl<'h> Evaluator<'h> {
         if let Some(def) = wb.name(bare, scope_sheet) {
             let text = def.formula.clone();
             let scope = def.scope.unwrap_or(self.sheet);
-            return match gridcraft_formula::parse(&text) {
+            return match gridcraft_formula::parse_any(&text) {
                 Ok(expr) => {
                     // Relative references in a name are relative to A1: used here, they move by
                     // this cell's offset from it.
@@ -691,6 +701,8 @@ impl<'h> Evaluator<'h> {
             "OFFSET" => self.offset(args),
             "INDIRECT" => self.indirect(args),
             "INDEX" => self.index(args),
+            "MATCH" => self.match_fn(args),
+            "VLOOKUP" | "HLOOKUP" => self.vhlookup(name, args),
             "XLOOKUP" => self.xlookup(args),
             "CELL" => self.cell_info(args),
             "TRIMRANGE" => self.trimrange(args),
@@ -1185,6 +1197,114 @@ impl<'h> Evaluator<'h> {
             }
             Ev::L(_) => err(CellError::Value),
         }
+    }
+
+    fn match_fn(&mut self, args: &[Expr]) -> Ev {
+        if args.len() == 3
+            && let Ev::R(areas) = self.eval(&args[1])
+            && let [a] = areas.as_slice()
+        {
+            let a = *a;
+            let key = self.value(&args[0]);
+            let mode = self.value(&args[2]);
+            if !matches!(key, Value::Array(_)) && !matches!(mode, Value::Array(_)) && mode.to_number().is_ok_and(|m| m.trunc() == 0.0) {
+                if let Value::Error(e) = key {
+                    return err(e);
+                }
+                if let Some(found) = self.host.exact_match(a.sheet, a.range, &key) {
+                    return match found {
+                        Some(p) => Ev::V(Value::Number(f64::from(p))),
+                        None => err(CellError::NA),
+                    };
+                }
+            }
+        }
+        self.builtin("MATCH", args)
+    }
+
+    /// VLOOKUP / HLOOKUP over a range reference: reads only the first column (or first row) to
+    /// find the match and then reads the single result cell, avoiding materializing unused columns.
+    fn vhlookup(&mut self, name: &str, args: &[Expr]) -> Ev {
+        if (3..=4).contains(&args.len())
+            && let Ev::R(areas) = self.eval(&args[1])
+            && let [a] = areas.as_slice()
+            && let Some(match_spec) = gridcraft_functions::lookup("MATCH")
+        {
+            let a = *a;
+            let vertical = name == "VLOOKUP";
+            let key = self.value(&args[0]);
+            let idx_v = self.value(&args[2]);
+            let approx_v = match args.get(3) {
+                None | Some(Expr::Missing) => None,
+                Some(e) => Some(self.value(e)),
+            };
+            if !matches!(key, Value::Array(_)) && !matches!(idx_v, Value::Array(_)) && !matches!(approx_v, Some(Value::Array(_))) {
+                if let Value::Error(e) = key {
+                    return err(e);
+                }
+                let idx = match idx_v.to_number() {
+                    Ok(n) => n,
+                    Err(e) => return err(e),
+                };
+                if idx < 1.0 {
+                    return err(CellError::Value);
+                }
+                let idx = idx.trunc() as u64 - 1;
+                let approx = match approx_v {
+                    None => true,
+                    Some(v) => match v.to_bool() {
+                        Ok(b) => b,
+                        Err(e) => return err(e),
+                    },
+                };
+                let len = if vertical { u64::from(a.range.width()) } else { u64::from(a.range.height()) };
+                if idx >= len {
+                    return err(CellError::Ref);
+                }
+                let search_range = if vertical {
+                    RangeRef::new(a.range.start, CellRef::new(a.range.end.row, a.range.start.col))
+                } else {
+                    RangeRef::new(a.range.start, CellRef::new(a.range.start.row, a.range.end.col))
+                };
+                if !approx && let Some(found) = self.host.exact_match(a.sheet, search_range, &key) {
+                    return match found {
+                        Some(p) if p >= 1 => {
+                            let k = p - 1;
+                            let target = if vertical {
+                                CellRef::new(a.range.start.row + k, a.range.start.col + idx as u32)
+                            } else {
+                                CellRef::new(a.range.start.row + idx as u32, a.range.start.col + k)
+                            };
+                            let v = self.host.cell_value(a.sheet, target);
+                            Ev::V(if matches!(v, Value::Empty) { Value::Number(0.0) } else { v })
+                        }
+                        _ => err(CellError::NA),
+                    };
+                }
+                let search_val = self.area_value(&Area { sheet: a.sheet, range: search_range });
+                let margs = vec![
+                    Arg { value: key, from_ref: false },
+                    Arg { value: search_val, from_ref: true },
+                    Arg { value: Value::Number(if approx { 1.0 } else { 0.0 }), from_ref: false },
+                ];
+                let mut ctx = FnCtx { ev: self };
+                return match gridcraft_functions::call(match_spec, &margs, &mut ctx) {
+                    Value::Number(p) if p >= 1.0 => {
+                        let k = p as u32 - 1;
+                        let target = if vertical {
+                            CellRef::new(a.range.start.row + k, a.range.start.col + idx as u32)
+                        } else {
+                            CellRef::new(a.range.start.row + idx as u32, a.range.start.col + k)
+                        };
+                        let v = self.host.cell_value(a.sheet, target);
+                        Ev::V(if matches!(v, Value::Empty) { Value::Number(0.0) } else { v })
+                    }
+                    Value::Error(e) => err(e),
+                    _ => err(CellError::NA),
+                };
+            }
+        }
+        self.builtin(name, args)
     }
 
     /// XLOOKUP whose result range is a reference returns a reference, as in Excel, so that it can

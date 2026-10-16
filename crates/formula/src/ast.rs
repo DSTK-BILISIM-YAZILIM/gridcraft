@@ -208,20 +208,35 @@ pub enum Expr {
 impl Expr {
     /// Visits every node depth-first.
     pub fn walk<'a>(&'a self, f: &mut dyn FnMut(&'a Expr)) {
-        f(self);
-        match self {
-            Expr::Array(rows) => rows.iter().flatten().for_each(|e| e.walk(f)),
-            Expr::Unary(_, e) | Expr::Paren(e) => e.walk(f),
-            Expr::Binary(_, a, b) => {
-                a.walk(f);
-                b.walk(f);
+        let mut stack = vec![self];
+        while let Some(node) = stack.pop() {
+            f(node);
+            match node {
+                Expr::Array(rows) => {
+                    for row in rows.iter().rev() {
+                        for el in row.iter().rev() {
+                            stack.push(el);
+                        }
+                    }
+                }
+                Expr::Unary(_, e) | Expr::Paren(e) => stack.push(e),
+                Expr::Binary(_, a, b) => {
+                    stack.push(b);
+                    stack.push(a);
+                }
+                Expr::Call(_, args) => {
+                    for arg in args.iter().rev() {
+                        stack.push(arg);
+                    }
+                }
+                Expr::Invoke(c, args) => {
+                    for arg in args.iter().rev() {
+                        stack.push(arg);
+                    }
+                    stack.push(c);
+                }
+                _ => {}
             }
-            Expr::Call(_, args) => args.iter().for_each(|e| e.walk(f)),
-            Expr::Invoke(c, args) => {
-                c.walk(f);
-                args.iter().for_each(|e| e.walk(f));
-            }
-            _ => {}
         }
     }
     /// Rewrites every node bottom-up.

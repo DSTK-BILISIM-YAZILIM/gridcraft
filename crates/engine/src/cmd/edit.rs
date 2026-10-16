@@ -135,18 +135,19 @@ pub(crate) fn input_to_cell(input: &str, sheet: usize, at: CellRef, wb: &mut gri
         || (input.len() > 1
             && (input.starts_with('+') || input.starts_with('-'))
             && gridcraft_core::parse::parse_number_text(input).is_none()
-            && input.chars().nth(1).is_some_and(|c| c.is_ascii_alphabetic() || c == '('));
+            && input.chars().nth(1).is_some_and(|c| c.is_alphabetic() || c == '('));
     if is_formula {
         let body = input.strip_prefix('=').unwrap_or(input);
+        let known = |name: &str| wb.name(name, sheet).is_some() || wb.table(name).is_some();
         // Excel closes missing parentheses for you.
         let mut text = body.to_string();
-        let mut parsed = gridcraft_formula::parse(&text);
+        let mut parsed = gridcraft_formula::parse_any_with_known(&text, known);
         for _ in 0..8 {
             if parsed.is_ok() {
                 break;
             }
             text.push(')');
-            parsed = gridcraft_formula::parse(&text);
+            parsed = gridcraft_formula::parse_any_with_known(&text, known);
         }
         let expr = parsed.map_err(|e| EngineError::Other(format!("There's a problem with this formula: {e}")))?;
         let expr = wb.name_call_case(expr);

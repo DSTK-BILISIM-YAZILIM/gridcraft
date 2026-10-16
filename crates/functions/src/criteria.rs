@@ -20,8 +20,11 @@ enum Operand {
     Number(f64),
     Bool(bool),
     Error(CellError),
-    /// Text (lower-cased chars kept for wildcard matching).
-    Text(String),
+    /// Text (with pre-tokenized wildcard pattern when wildcards are present).
+    Text {
+        raw: String,
+        wild: Option<Vec<Tok>>,
+    },
     /// Nothing after the operator (`"="`, `"<>"`) or an empty criterion.
     Blank,
 }
@@ -78,7 +81,8 @@ impl Criterion {
         } else if let Some(e) = CellError::parse(rest) {
             Operand::Error(e)
         } else {
-            Operand::Text(rest.to_string())
+            let wild = (matches!(op, Op::Eq | Op::Ne) && has_wildcards(rest)).then(|| tokenize(rest));
+            Operand::Text { raw: rest.to_string(), wild }
         };
         Criterion { op, operand, bare_empty: false }
     }
@@ -86,11 +90,11 @@ impl Criterion {
     /// Whether a cell value satisfies the criterion.
     pub(crate) fn matches(&self, v: &Value) -> bool {
         let v = match v {
-            Value::Array(a) => a.data.first().cloned().unwrap_or(Value::Empty),
-            other => other.clone(),
+            Value::Array(a) => a.data.first().unwrap_or(&Value::Empty),
+            other => other,
         };
         if self.bare_empty {
-            return matches!(&v, Value::Empty) || matches!(&v, Value::Text(t) if t.is_empty());
+            return matches!(v, Value::Empty) || matches!(v, Value::Text(t) if t.is_empty());
         }
         match &self.operand {
             Operand::Blank => {
@@ -99,14 +103,14 @@ impl Criterion {
                     Op::Eq => blank,
                     Op::Ne => !blank,
                     // "<" / ">" with nothing: Excel compares against "" for text cells.
-                    _ => match &v {
+                    _ => match v {
                         Value::Text(t) => cmp_op(self.op, compare_text(t, "")),
                         _ => false,
                     },
                 }
             }
             Operand::Number(n) => {
-                let cell = match &v {
+                let cell = match v {
                     Value::Number(x) => Some(*x),
                     // Numeric text matches only for equality (COUNTIF("1") counts text "1").
                     Value::Text(t) if matches!(self.op, Op::Eq | Op::Ne) => parse_number_text(t),
@@ -117,26 +121,28 @@ impl Criterion {
                     None => self.op == Op::Ne,
                 }
             }
-            Operand::Bool(b) => match &v {
+            Operand::Bool(b) => match v {
                 Value::Bool(x) => cmp_op(self.op, x.cmp(b)),
                 _ => self.op == Op::Ne,
             },
-            Operand::Error(e) => match &v {
+            Operand::Error(e) => match v {
                 Value::Error(x) => cmp_op(self.op, x.code().cmp(&e.code())),
                 _ => self.op == Op::Ne,
             },
-            Operand::Text(pat) => match self.op {
+            Operand::Text { raw, wild } => match self.op {
                 Op::Eq | Op::Ne => {
                     // Blank cells hold no text: `"*"` skips them and `"<>*"` counts them.
-                    let cell_text = match &v {
-                        Value::Text(t) => Some(t.to_string()),
-                        _ => None,
+                    let m = match v {
+                        Value::Text(t) => match wild {
+                            Some(tokens) => match_from(tokens, &lower_chars(t), true).is_some(),
+                            None => compare_text(t, raw) == Ordering::Equal,
+                        },
+                        _ => false,
                     };
-                    let m = cell_text.is_some_and(|t| wildcard_match(pat, &t));
                     if self.op == Op::Eq { m } else { !m }
                 }
-                _ => match &v {
-                    Value::Text(t) => cmp_op(self.op, compare_text(t, pat)),
+                _ => match v {
+                    Value::Text(t) => cmp_op(self.op, compare_text(t, raw)),
                     _ => false,
                 },
             },
@@ -183,9 +189,9 @@ fn lower_chars(s: &str) -> Vec<char> {
     s.chars().flat_map(char::to_lowercase).collect()
 }
 
-/// Whether the pattern contains an unescaped wildcard.
+/// Whether the pattern contains an unescaped wildcard or escape character.
 pub(crate) fn has_wildcards(pattern: &str) -> bool {
-    tokenize(pattern).iter().any(|t| !matches!(t, Tok::Char(_))) || pattern.contains('~')
+    pattern.bytes().any(|b| matches!(b, b'*' | b'?' | b'~'))
 }
 
 /// Case-insensitive whole-text match with `*`, `?` and `~` escapes.

@@ -503,6 +503,35 @@ pub const TURKISH: &[(&str, &str)] = &[
     ("CUBESET", "KÜPKÜMESİ"),
     ("CUBESETCOUNT", "KÜPKÜMESAYISI"),
     ("CUBEVALUE", "KÜPDEĞERİ"),
+    // Additional statistical & financial aliases
+    ("FTEST", "FTESTİ"),
+    ("TTEST", "TTESTİ"),
+    ("Z.TEST", "Z.TESTİ"),
+    ("ZTEST", "ZTESTİ"),
+    ("ISPMT", "ISPMT"),
+    ("AMORDEGRC", "AMORDEGRC"),
+    ("AMORLINC", "AMORLINC"),
+    ("VAR", "VAR"),
+    ("VARA", "VARA"),
+    ("VAR.P", "VAR.P"),
+    ("VAR.S", "VAR.S"),
+    ("MOD", "MOD"),
+    ("RANK", "RANK"),
+];
+
+const TURKISH_ALT_ALIASES: &[(&str, &str)] = &[
+    ("OR", "VEYA"),
+    ("XOR", "ÖZELYADA"),
+    ("COUNTBLANK", "BOŞLUKSAY"),
+    ("COUNT", "BAĞ.DEĞ.SAY"),
+    ("COUNTA", "BAĞ.DEĞ.DOLU.SAY"),
+    ("RAND", "S.SAYI.ÜRET"),
+    ("RAND", "SSAYIÜRET"),
+    ("TRANSPOSE", "DEVRİK.DÖNÜŞÜM"),
+    ("AVERAGEIF", "ORTALAMA.EĞER"),
+    ("AVERAGEIFS", "ORTALAMA.ÇOKEĞER"),
+    ("ISPMT", ".ÖDEME"),
+    ("VARP", "VARS"),
 ];
 
 fn fold_tr_char(c: char) -> char {
@@ -542,9 +571,35 @@ impl FormulaLocale {
         match self {
             Self::En => localized,
             Self::Es => SPANISH.iter().find(|(_, es)| es.eq_ignore_ascii_case(localized)).map(|(en, _)| *en).unwrap_or(localized),
-            Self::Tr => TURKISH.iter().find(|(_, tr)| eq_tr_ignore_case(tr, localized)).map(|(en, _)| *en).unwrap_or(localized),
+            Self::Tr => TURKISH
+                .iter()
+                .chain(TURKISH_ALT_ALIASES.iter())
+                .find(|(_, tr)| eq_tr_ignore_case(tr, localized))
+                .map(|(en, _)| *en)
+                .unwrap_or(localized),
         }
     }
+}
+
+fn canonical_name_any(name: &str) -> &str {
+    if TURKISH.iter().any(|(en, _)| en.eq_ignore_ascii_case(name)) || SPANISH.iter().any(|(en, _)| en.eq_ignore_ascii_case(name)) {
+        return name;
+    }
+    let tr = FormulaLocale::Tr.canonical_name(name);
+    if !std::ptr::eq(tr, name) {
+        return tr;
+    }
+    FormulaLocale::Es.canonical_name(name)
+}
+
+fn has_non_en_alias(expr: &Expr) -> bool {
+    let mut found = false;
+    expr.walk(&mut |e| match e {
+        Expr::Call(n, _) if !std::ptr::eq(canonical_name_any(n), n.as_str()) => found = true,
+        Expr::Name(n) if boolean_alias(n, FormulaLocale::Tr).is_some() || boolean_alias(n, FormulaLocale::Es).is_some() => found = true,
+        _ => {}
+    });
+    found
 }
 
 /// Parses UI input using the selected function table and separators. Existing names and
@@ -555,6 +610,36 @@ pub fn parse_input(src: &str, locale: FormulaLocale, known_name: impl Fn(&str) -
         normalize(&mut expr, locale, &known_name, &mut Vec::new(), 0, false)?;
     }
     Ok(expr)
+}
+
+/// Parses a formula written in canonical English or any supported localized syntax
+/// (Turkish/Spanish function names, `;` argument separators, `,` decimal separators),
+/// returning an expression normalized to canonical English function names and booleans.
+pub fn parse_any(src: &str) -> Result<Expr, ParseError> {
+    parse_any_with_known(src, |_| false)
+}
+
+/// Like [`parse_any`], preserving workbook defined names and table names reported by `known_name`.
+pub fn parse_any_with_known(src: &str, known_name: impl Fn(&str) -> bool) -> Result<Expr, ParseError> {
+    match parser::parse(src) {
+        Ok(mut expr) => {
+            if has_non_en_alias(&expr)
+                && src.contains(',')
+                && !src.contains('.')
+                && let Ok(mut tr_expr) = parser::parse_syntax(src, FormulaLocale::Tr)
+            {
+                normalize_any(&mut tr_expr, &known_name, &mut Vec::new(), 0)?;
+                return Ok(tr_expr);
+            }
+            normalize_any(&mut expr, &known_name, &mut Vec::new(), 0)?;
+            Ok(expr)
+        }
+        Err(en_err) => {
+            let mut expr = parser::parse_syntax(src, FormulaLocale::Tr).map_err(|_| en_err)?;
+            normalize_any(&mut expr, &known_name, &mut Vec::new(), 0)?;
+            Ok(expr)
+        }
+    }
 }
 
 /// Prints canonical expressions for editing. Name collisions retain the canonical spelling
@@ -738,6 +823,71 @@ fn normalize(
         }
         // Array elements have already been parsed as literals. Sheet/structured references
         // contain user-defined labels and must not be translated.
+        _ => {}
+    }
+    Ok(())
+}
+
+fn normalize_any(expr: &mut Expr, known_name: &impl Fn(&str) -> bool, bindings: &mut Vec<String>, depth: usize) -> Result<(), ParseError> {
+    if depth > parser::MAX_DEPTH {
+        return Err(ParseError { msg: "formula is nested too deeply".into(), pos: 0 });
+    }
+    let bound = |name: &str, bindings: &[String]| bindings.iter().rev().any(|n| eq_tr_ignore_case(n, name)) || known_name(name);
+    match expr {
+        Expr::Name(name) if !bound(name, bindings) => {
+            if let Some(value) = boolean_alias(name, FormulaLocale::Tr).or_else(|| boolean_alias(name, FormulaLocale::Es)) {
+                *expr = Expr::Bool(value);
+            }
+        }
+        Expr::Call(name, args) if name == "LET" && args.len() >= 3 && !args.len().is_multiple_of(2) => {
+            let saved = bindings.len();
+            if let Some((body, pairs)) = args.split_last_mut() {
+                for pair in pairs.chunks_mut(2) {
+                    if let [declaration, value] = pair {
+                        normalize_any(value, known_name, bindings, depth + 1)?;
+                        if let Expr::Name(name) = declaration {
+                            bindings.push(name.clone());
+                        }
+                    }
+                }
+                normalize_any(body, known_name, bindings, depth + 1)?;
+            }
+            bindings.truncate(saved);
+        }
+        Expr::Call(name, args) if name == "LAMBDA" => {
+            let saved = bindings.len();
+            if let Some((body, params)) = args.split_last_mut() {
+                for param in params {
+                    if let Expr::Name(name) = param {
+                        bindings.push(name.clone());
+                    }
+                }
+                normalize_any(body, known_name, bindings, depth + 1)?;
+            }
+            bindings.truncate(saved);
+        }
+        Expr::Call(name, args) => {
+            if !bound(name, bindings) {
+                let canonical = canonical_name_any(name);
+                if !std::ptr::eq(canonical, name.as_str()) {
+                    *name = canonical.to_string();
+                }
+            }
+            for arg in args {
+                normalize_any(arg, known_name, bindings, depth + 1)?;
+            }
+        }
+        Expr::Invoke(callee, args) => {
+            normalize_any(callee, known_name, bindings, depth + 1)?;
+            for arg in args {
+                normalize_any(arg, known_name, bindings, depth + 1)?;
+            }
+        }
+        Expr::Unary(_, child) | Expr::Paren(child) => normalize_any(child, known_name, bindings, depth + 1)?,
+        Expr::Binary(_, left, right) => {
+            normalize_any(left, known_name, bindings, depth + 1)?;
+            normalize_any(right, known_name, bindings, depth + 1)?;
+        }
         _ => {}
     }
     Ok(())

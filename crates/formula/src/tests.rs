@@ -301,3 +301,26 @@ fn trim_references_adjust() {
     let refs: Vec<String> = parse("SUM(Sheet2!A1:.B5)").unwrap().references().iter().map(|r| printer::reference_a1(r)).collect();
     assert_eq!(refs, ["Sheet2!A1:B5"]);
 }
+
+#[test]
+fn cross_locale_parse_any_and_deep_walk() {
+    let norm = |src: &str| print(&parse_any(src).unwrap_or_else(|e| panic!("{src}: {e}")));
+    assert_eq!(norm("TOPLA(A1:A10)"), "SUM(A1:A10)");
+    assert_eq!(norm("EĞER(A1>1,5;\"evet\";\"hayır\")"), "IF(A1>1.5,\"evet\",\"hayır\")");
+    assert_eq!(norm("DÜŞEYARA(A1;B1:D100;3;YANLIŞ)"), "VLOOKUP(A1,B1:D100,3,FALSE)");
+    assert_eq!(norm("_xlfn.Çaprazara(A1;B1:B10;C1:C10)"), "XLOOKUP(A1,B1:B10,C1:C10)");
+    assert_eq!(norm("ÇOKETOPLA(C1:C10;A1:A10;\">0\";B1:B10;DOĞRU)"), "SUMIFS(C1:C10,A1:A10,\">0\",B1:B10,TRUE)");
+    assert_eq!(norm("Tablo1[[#Başlıklar];[Satış]]"), "Tablo1[[#Headers],[Satış]]");
+    assert_eq!(norm("Tablo1[[#Bu Satır];[Birim Fiyat]]"), "Tablo1[@[Birim Fiyat]]");
+    assert_eq!(norm("Tablo1[#Tümü]"), "Tablo1[#All]");
+    assert_eq!(norm("Tablo1[#Veriler]"), "Tablo1[#Data]");
+    assert_eq!(norm("Tablo1[#Toplamlar]"), "Tablo1[#Totals]");
+
+    // Deep nested IF and long additive chain survive parsing and iterative AST walking.
+    let mut nested = "A1".to_string();
+    for _ in 0..350 {
+        nested = format!("EĞER(A1>0;{nested};0)");
+    }
+    let expr = parse_any(&nested).expect("deep nested Turkish IF parses");
+    assert!(!expr.references().is_empty());
+}

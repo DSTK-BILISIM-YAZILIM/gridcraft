@@ -398,10 +398,10 @@ impl KeptReader {
     }
 
     fn sheet_elements(&mut self, cx: &mut Ctx<'_>, part: &str, name: &str, rels: &[PreservedRel], p: &mut Preserved, seen: &mut HashSet<String>) {
-        let scan = match cx.pkg.read(part) {
+        let scan = cx.sheet_scan.take().or_else(|| match cx.pkg.read(part) {
             Ok(Some(bytes)) => scan_sheet(&bytes),
             _ => None,
-        };
+        });
         let Some(scan) = scan else {
             cx.warn(format!("sheet \"{name}\": controls and embedded objects could not be read and were dropped"));
             return;
@@ -489,7 +489,7 @@ impl KeptReader {
 }
 
 /// What a sheet part holds for pass-through.
-struct SheetScan {
+pub(crate) struct SheetScan {
     /// (slot, XML with the namespace declarations it needs).
     fragments: Vec<(String, String)>,
     legacy_drawing: Option<String>,
@@ -497,11 +497,27 @@ struct SheetScan {
     page_setup: Option<String>,
 }
 
+pub(crate) fn maybe_scan_sheet(bytes: &[u8], rels: &[crate::package::Rel]) -> Option<SheetScan> {
+    if rels.iter().any(|r| SHEET_ELEMENT_KINDS.iter().any(|k| r.kind.eq_ignore_ascii_case(k))) { scan_sheet(bytes) } else { None }
+}
+
 /// Finds the sheet's `<picture>`, `<oleObjects>`, `<controls>` (also inside
 /// `<mc:AlternateContent>`) and the `<legacyDrawing>` id. `None` when the XML is damaged.
 fn scan_sheet(bytes: &[u8]) -> Option<SheetScan> {
     let data = xml::to_utf8(bytes);
-    let text = std::str::from_utf8(&data).ok()?;
+    let raw_text = std::str::from_utf8(&data).ok()?;
+    let stripped: Cow<'_, str> = if let Some(sd_start) = raw_text.find("<sheetData")
+        && let Some(rel_end) = raw_text.get(sd_start..).and_then(|s| s.find("</sheetData>"))
+    {
+        let sd_end = sd_start + rel_end + "</sheetData>".len();
+        let mut s = String::with_capacity(sd_start + raw_text.len().saturating_sub(sd_end));
+        s.push_str(raw_text.get(..sd_start)?);
+        s.push_str(raw_text.get(sd_end..)?);
+        Cow::Owned(s)
+    } else {
+        Cow::Borrowed(raw_text)
+    };
+    let text = stripped.as_ref();
     let mut reader = Reader::from_str(text);
     let mut decls: Vec<(String, String)> = vec![];
     let mut out = SheetScan { fragments: vec![], legacy_drawing: None, page_setup: None };

@@ -10,7 +10,7 @@ use crate::xml::{self, El};
 /// Largest decompressed part accepted.
 pub const MAX_PART: u64 = 512 * 1024 * 1024;
 /// Largest total decompressed size read from one package.
-pub const MAX_TOTAL: u64 = 1024 * 1024 * 1024;
+pub const MAX_TOTAL: u64 = 4 * 1024 * 1024 * 1024;
 /// Most entries accepted in the zip directory.
 pub const MAX_ENTRIES: usize = 200_000;
 

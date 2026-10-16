@@ -15,7 +15,7 @@ pub fn to_file(f: &Formula) -> String {
 /// Arbitrary formula text (names, CF, validation) for a file. Unparseable text is kept.
 pub fn text_to_file(text: &str) -> String {
     let body = text.strip_prefix('=').unwrap_or(text);
-    match gridcraft_formula::parse(body) {
+    match gridcraft_formula::parse_any(body) {
         Ok(e) => expr_to_file(e),
         Err(_) => body.to_string(),
     }
@@ -102,16 +102,33 @@ fn strip_param_prefix(n: String) -> String {
     }
 }
 
-/// Formula text read from a file → model text (strips prefixes when it parses).
-pub fn from_file(text: &str) -> String {
+/// Parses formula text read from a file into a canonical [`Expr`] (stripping `_xlpm.` prefixes),
+/// or returns the unparseable body text without leading `=`.
+pub fn from_file_expr(text: &str) -> Result<Expr, String> {
     let body = text.strip_prefix('=').unwrap_or(text);
-    match gridcraft_formula::parse(body) {
-        Ok(e) => gridcraft_formula::print(&e.map(&mut |x| match x {
+    match gridcraft_formula::parse_any(body) {
+        Ok(e) => Ok(e.map(&mut |x| match x {
             Expr::Name(n) => Expr::Name(strip_param_prefix(n)),
             Expr::Call(n, args) => Expr::Call(strip_param_prefix(n), args),
             other => other,
         })),
-        Err(_) => body.to_string(),
+        Err(_) => Err(body.to_string()),
+    }
+}
+
+/// Formula text read from a file → [`Formula`] in a single parse pass.
+pub fn from_file_formula(text: &str) -> Formula {
+    match from_file_expr(text) {
+        Ok(e) => Formula::from_expr(e),
+        Err(raw) => Formula { text: raw, expr: None, array: None },
+    }
+}
+
+/// Formula text read from a file → model text (strips prefixes when it parses).
+pub fn from_file(text: &str) -> String {
+    match from_file_expr(text) {
+        Ok(e) => gridcraft_formula::print(&e),
+        Err(raw) => raw,
     }
 }
 

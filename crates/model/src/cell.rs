@@ -24,7 +24,7 @@ impl Formula {
     /// `#NAME?`.
     pub fn new(text: &str) -> Formula {
         let body = text.strip_prefix('=').unwrap_or(text);
-        match gridcraft_formula::parse(body) {
+        match gridcraft_formula::parse_any(body) {
             Ok(e) => Formula { text: gridcraft_formula::print(&e), expr: Some(Arc::new(e)), array: None },
             Err(_) => Formula { text: body.to_string(), expr: None, array: None },
         }
@@ -34,11 +34,11 @@ impl Formula {
     }
     /// The parsed expression, re-parsing after deserialization.
     pub fn expr(&self) -> Option<Expr> {
-        self.expr.as_deref().cloned().or_else(|| gridcraft_formula::parse(&self.text).ok())
+        self.expr.as_deref().cloned().or_else(|| gridcraft_formula::parse_any(&self.text).ok())
     }
     /// The parsed expression without copying it (re-parses after deserialization).
     pub fn expr_arc(&self) -> Option<Arc<Expr>> {
-        self.expr.clone().or_else(|| gridcraft_formula::parse(&self.text).ok().map(Arc::new))
+        self.expr.clone().or_else(|| gridcraft_formula::parse_any(&self.text).ok().map(Arc::new))
     }
 }
 

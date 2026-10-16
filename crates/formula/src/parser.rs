@@ -15,7 +15,7 @@ pub struct ParseError {
     pub pos: usize,
 }
 
-pub(crate) const MAX_DEPTH: usize = 256;
+pub(crate) const MAX_DEPTH: usize = 1024;
 
 /// Parses formula text. A leading `=` (or `+`/`-` as Lotus users type) is accepted and skipped
 /// for `=`.
@@ -90,7 +90,20 @@ fn word_is_cell(w: &str) -> Option<Anchor> {
 
 /// `_xlfn.XLOOKUP` → `XLOOKUP`.
 pub fn normalize_function_name(name: &str) -> String {
-    let u = name.to_ascii_uppercase();
+    let u: String = name
+        .chars()
+        .filter(|&c| c != '\u{0307}')
+        .map(|c| match c {
+            'ğ' => 'Ğ',
+            'ü' => 'Ü',
+            'ş' => 'Ş',
+            'ö' => 'Ö',
+            'ç' => 'Ç',
+            'ı' => 'I',
+            'i' if !name.is_ascii() => 'İ',
+            _ => c.to_ascii_uppercase(),
+        })
+        .collect();
     for p in ["_XLFN._XLWS.", "_XLFN.", "_XLWS.", "_XLUDF."] {
         if let Some(r) = u.strip_prefix(p) {
             return r.to_string();
@@ -433,13 +446,28 @@ pub fn parse_struct(table: &str, body: &str) -> Result<StructRef, String> {
         out
     };
     let item = |s: &str| -> Option<StructItem> {
-        match s.trim().to_ascii_lowercase().as_str() {
-            "#all" => Some(StructItem::All),
-            "#data" => Some(StructItem::Data),
-            "#headers" => Some(StructItem::Headers),
-            "#totals" => Some(StructItem::Totals),
-            "#this row" => Some(StructItem::ThisRow),
-            _ => None,
+        let t = s.trim();
+        match t.to_ascii_lowercase().as_str() {
+            "#all" | "#todo" => Some(StructItem::All),
+            "#data" | "#datos" => Some(StructItem::Data),
+            "#headers" | "#encabezados" => Some(StructItem::Headers),
+            "#totals" | "#totales" => Some(StructItem::Totals),
+            "#this row" | "#esta fila" => Some(StructItem::ThisRow),
+            _ => {
+                if crate::input::eq_tr_ignore_case(t, "#Tümü") {
+                    Some(StructItem::All)
+                } else if crate::input::eq_tr_ignore_case(t, "#Veriler") {
+                    Some(StructItem::Data)
+                } else if crate::input::eq_tr_ignore_case(t, "#Üst Bilgiler") || crate::input::eq_tr_ignore_case(t, "#Başlıklar") {
+                    Some(StructItem::Headers)
+                } else if crate::input::eq_tr_ignore_case(t, "#Toplamlar") {
+                    Some(StructItem::Totals)
+                } else if crate::input::eq_tr_ignore_case(t, "#Bu Satır") {
+                    Some(StructItem::ThisRow)
+                } else {
+                    None
+                }
+            }
         }
     };
     let unexpected = |gap: &str| format!("unexpected `{gap}` in structured reference");
@@ -491,7 +519,7 @@ pub fn parse_struct(table: &str, body: &str) -> Result<StructRef, String> {
                 }
                 '[' => {
                     if depth == 0 {
-                        if !matches!(gap.trim(), "" | "," | ":") {
+                        if !matches!(gap.trim(), "" | "," | ";" | ":") {
                             return Err(unexpected(gap.trim()));
                         }
                         gap.clear();
@@ -528,8 +556,8 @@ pub fn parse_struct(table: &str, body: &str) -> Result<StructRef, String> {
         }
         let tail = gap.trim();
         if !tail.is_empty() {
-            let bare = tail.strip_prefix(',').map(str::trim).unwrap_or("");
-            let simple = !bare.is_empty() && !bare.chars().any(|c| matches!(c, '[' | ']' | '#' | '\'' | ',' | ':'));
+            let bare = tail.strip_prefix([',', ';']).map(str::trim).unwrap_or("");
+            let simple = !bare.is_empty() && !bare.chars().any(|c| matches!(c, '[' | ']' | '#' | '\'' | ',' | ';' | ':'));
             if !(simple && specifiers == [StructItem::ThisRow] && cols.is_empty()) {
                 return Err(unexpected(tail));
             }

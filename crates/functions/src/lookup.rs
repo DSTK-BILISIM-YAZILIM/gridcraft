@@ -107,8 +107,8 @@ fn bsearch_upto(x: &Value, hay: &[Value], desc: bool) -> Option<usize> {
 }
 
 /// A 1-D view of an array (row or column), `None` when it is 2-D.
-fn vector(a: &Array) -> Option<Vec<Value>> {
-    if a.rows == 1 || a.cols == 1 { Some(a.data.clone()) } else { None }
+fn vector(a: &Array) -> Option<&[Value]> {
+    if a.rows == 1 || a.cols == 1 { Some(&a.data) } else { None }
 }
 
 fn column(a: &Array, c: usize) -> Vec<Value> {
@@ -139,11 +139,21 @@ fn vh_lookup(args: &[Arg], vertical: bool) -> R<Value> {
     }
     let idx = idx.trunc() as usize - 1;
     let approx = opt_bool(args, 3, true)?;
-    let (keys, len) = if vertical { (column(&table, 0), table.cols) } else { (row(&table, 0), table.rows) };
+    let len = if vertical { table.cols } else { table.rows };
     if idx >= len {
         return Err(CellError::Ref);
     }
-    let pos = if approx { bsearch_last(&x, &keys, false) } else { find_exact(&x, &keys, true, false) };
+    let keys_owned;
+    let keys: &[Value] = if vertical && table.cols == 1 || !vertical && table.rows == 1 {
+        &table.data
+    } else if vertical {
+        keys_owned = column(&table, 0);
+        &keys_owned
+    } else {
+        keys_owned = row(&table, 0);
+        &keys_owned
+    };
+    let pos = if approx { bsearch_last(&x, keys, false) } else { find_exact(&x, keys, true, false) };
     let pos = pos.ok_or(CellError::NA)?;
     let v = if vertical { table.get(pos, idx) } else { table.get(idx, pos) };
     Ok(cell_result(v.cloned().unwrap_or(Value::Empty)))
@@ -165,8 +175,14 @@ fn lookup(args: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
     }
     let la = as_array(lv);
     if args.len() >= 3 {
-        let keys = if la.rows == 1 || la.cols == 1 { la.data.clone() } else { column(&la, 0) };
-        let pos = bsearch_last(&x, &keys, false).ok_or(CellError::NA)?;
+        let keys_owned;
+        let keys: &[Value] = if la.rows == 1 || la.cols == 1 {
+            &la.data
+        } else {
+            keys_owned = column(&la, 0);
+            &keys_owned
+        };
+        let pos = bsearch_last(&x, keys, false).ok_or(CellError::NA)?;
         let rv = &arg(args, 2)?.value;
         if let Value::Error(e) = rv {
             return Err(*e);
@@ -200,14 +216,15 @@ fn match_fn(args: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
     if let Value::Error(e) = av {
         return Err(*e);
     }
-    let hay = vector(&as_array(av)).ok_or(CellError::NA)?;
+    let arr = as_array(av);
+    let hay = vector(&arr).ok_or(CellError::NA)?;
     let mt = opt_num(args, 2, 1.0)?;
     let pos = if mt == 0.0 {
-        find_exact(&x, &hay, true, false)
+        find_exact(&x, hay, true, false)
     } else if mt > 0.0 {
-        bsearch_last(&x, &hay, false)
+        bsearch_last(&x, hay, false)
     } else {
-        bsearch_last(&x, &hay, true)
+        bsearch_last(&x, hay, true)
     };
     pos.map(|p| Value::Number((p + 1) as f64)).ok_or(CellError::NA)
 }
@@ -306,19 +323,19 @@ fn xlookup(args: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
     }
     let mm = if has(args, 4) { opt_int(args, 4, 0)? } else { 0 };
     let sm = if has(args, 5) { opt_int(args, 5, 1)? } else { 1 };
-    match xsearch(&x, &hay, mm, sm)? {
+    match xsearch(&x, hay, mm, sm)? {
         Some(p) => {
             if vertical {
-                let r = row(&ra, p);
-                if r.len() == 1 {
-                    return Ok(cell_result(r.into_iter().next().unwrap_or(Value::Empty)));
+                if ra.cols == 1 {
+                    return Ok(cell_result(ra.data.get(p).cloned().unwrap_or(Value::Empty)));
                 }
+                let r = row(&ra, p);
                 array_val(1, r.len(), r)
             } else {
-                let c = column(&ra, p);
-                if c.len() == 1 {
-                    return Ok(cell_result(c.into_iter().next().unwrap_or(Value::Empty)));
+                if ra.rows == 1 {
+                    return Ok(cell_result(ra.data.get(p).cloned().unwrap_or(Value::Empty)));
                 }
+                let c = column(&ra, p);
                 array_val(c.len(), 1, c)
             }
         }
@@ -338,10 +355,11 @@ fn xmatch(args: &[Arg], _c: &mut dyn Ctx) -> R<Value> {
     if let Value::Error(e) = lv {
         return Err(*e);
     }
-    let hay = vector(&as_array(lv)).ok_or(CellError::Value)?;
+    let arr = as_array(lv);
+    let hay = vector(&arr).ok_or(CellError::Value)?;
     let mm = if has(args, 2) { int(args, 2)? } else { 0 };
     let sm = if has(args, 3) { int(args, 3)? } else { 1 };
-    xsearch(&x, &hay, mm, sm)?.map(|p| Value::Number((p + 1) as f64)).ok_or(CellError::NA)
+    xsearch(&x, hay, mm, sm)?.map(|p| Value::Number((p + 1) as f64)).ok_or(CellError::NA)
 }
 
 // ---------------------------------------------------------------------------------------------
