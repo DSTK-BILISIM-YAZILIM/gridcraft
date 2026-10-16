@@ -270,6 +270,77 @@ pub fn color_palette(ui: &mut Ui, theme_colors: &[u32; 12], none_label: &str) ->
     picked
 }
 
+fn tr_dynamic(ui: &Ui, msg: &str) -> String {
+    let lang = i18n::current(ui.ctx());
+    if lang != i18n::Language::Tr {
+        return lang.tr(msg).to_string();
+    }
+    let translated = lang.tr(msg);
+    if translated != msg {
+        return translated.to_string();
+    }
+    if let Some(rest) = msg.strip_prefix("command `")
+        && let Some((cmd, reason)) = rest.split_once("` is not available right now: ")
+    {
+        return format!("`{cmd}` komutu şu anda kullanılamıyor: {}", lang.tr(reason));
+    }
+    if let Some(rest) = msg.strip_prefix("invalid parameters for `")
+        && let Some((cmd, reason)) = rest.split_once("`: ")
+    {
+        return format!("`{cmd}` için geçersiz parametreler: {}", lang.tr(reason));
+    }
+    if let Some(rest) = msg.strip_prefix("unknown command `")
+        && let Some(cmd) = rest.strip_suffix('`')
+    {
+        return format!("bilinmeyen komut `{cmd}`");
+    }
+    if let Some(rest) = msg.strip_prefix("internal error in `")
+        && let Some((cmd, reason)) = rest.split_once("` (the workbook was kept as it was): ")
+    {
+        return format!("`{cmd}` içinde iç hata (çalışma kitabı olduğu gibi korundu): {}", lang.tr(reason));
+    }
+    if let Some(rest) = msg.strip_prefix("There's a problem with this formula: ") {
+        return format!("Bu formülde bir sorun var: {}", lang.tr(rest));
+    }
+    if let Some(rest) = msg.strip_prefix("We couldn't find what you were looking for: ") {
+        return format!("Aradığınızı bulamadık: {rest}");
+    }
+    if let Some(rest) = msg.strip_prefix("A scenario named '")
+        && let Some(name) = rest.strip_suffix("' already exists on this sheet.")
+    {
+        return format!("Bu sayfada '{name}' adlı bir senaryo zaten mevcut.");
+    }
+    if let Some(rest) = msg.strip_prefix("The criteria label `")
+        && let Some(head) = rest.strip_suffix("` doesn't match a column of the list.")
+    {
+        return format!("`{head}` ölçüt etiketi listedeki hiçbir sütunla eşleşmiyor.");
+    }
+    if let Some(rest) = msg.strip_prefix("We can't open '")
+        && let Some((name, reason)) = rest.split_once("': ")
+    {
+        return format!("'{name}' açılamıyor: {}", lang.tr(reason));
+    }
+    if let Some(rest) = msg.strip_prefix("We can't import '")
+        && let Some((name, reason)) = rest.split_once("': ")
+    {
+        return format!("'{name}' içeri aktarılamıyor: {}", lang.tr(reason));
+    }
+    if let Some(rest) = msg.strip_suffix(" is password-protected. Enter its password to open it.") {
+        return format!("{rest} parola korumalıdır. Açmak için parolasını girin.");
+    }
+    if let Some(rest) = msg.strip_prefix("Width: ")
+        && let Some(mid) = rest.strip_suffix(" pixels)")
+    {
+        return format!("Genişlik: {mid} piksel)");
+    }
+    if let Some(rest) = msg.strip_prefix("Height: ")
+        && let Some(mid) = rest.strip_suffix(" pixels)")
+    {
+        return format!("Yükseklik: {mid} piksel)");
+    }
+    msg.to_string()
+}
+
 pub fn message_box(app: &mut SheetApp, ctx: &egui::Context) {
     let Some((title, msg)) = app.message.clone() else { return };
     let mut close = false;
@@ -281,7 +352,7 @@ pub fn message_box(app: &mut SheetApp, ctx: &egui::Context) {
             ui.painter().text(r.center(), Align2::CENTER_CENTER, "!", theme::ui_bold(20.0), Color32::WHITE);
             ui.vertical(|ui| {
                 ui.label(egui::RichText::new(tr(ui, &title)).strong());
-                ui.add(egui::Label::new(tr(ui, &msg)).wrap());
+                ui.add(egui::Label::new(tr_dynamic(ui, &msg)).wrap());
             });
         });
         ui.add_space(8.0);
@@ -310,7 +381,7 @@ pub fn toast(app: &mut SheetApp, ctx: &egui::Context) {
         |ui| {
             egui::Frame::popup(ui.style()).show(ui, |ui| {
                 ui.set_max_width(320.0);
-                ui.label(tr(ui, &msg));
+                ui.label(tr_dynamic(ui, &msg));
             });
         },
     );

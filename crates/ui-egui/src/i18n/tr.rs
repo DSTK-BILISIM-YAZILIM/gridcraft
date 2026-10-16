@@ -1492,6 +1492,908 @@ pub(super) fn translate(text: &str) -> Option<&'static str> {
         "WordArt" => "WordArt",
         "Zoom to Selection" => "Seçimi Yakınlaştır",
 
+        // Formül Oluşturucu, İletişim Kutuları ve Ek Arabirim Metinleri
+        "Search:" => "Ara:",
+        "e.g. lookup, average, date" => "örn. düşeyara, ortalama, tarih",
+        "MathTrig" => "Matematik ve Trigonometri",
+        "Lookup" => "Arama ve Başvuru",
+        "DateTime" => "Tarih ve Saat",
+        "Compatibility" => "Uyumluluk",
+        "Cube" => "Küp",
+        "AddIn" => "Eklenti ve Otomasyon",
+        " (password)" => " (parolalı)",
+        " (password, unlocked)" => " (parolalı, kilidi açıldı)",
+        "(unnamed)" => "(adsız)",
+        "A clean-room, open-source, Rust-native spreadsheet. Part of ArtCraft." => {
+            "Temiz oda yöntemiyle geliştirilmiş, açık kaynaklı, Rust tabanlı hesap tablosu. ArtCraft'ın bir parçasıdır."
+        }
+        "Add Watch (active cell)" => "İzleme Ekle (etkin hücre)",
+        "Automation in this workbook. GridCraft runs its own scripts; a file's VBA project is preserved but not executed." => {
+            "Bu çalışma kitabındaki otomasyon. GridCraft kendi betiklerini çalıştırır; dosyadaki VBA projesi korunur ancak çalıştırılmaz."
+        }
+        "Background Color:" => "Arka Plan Rengi:",
+        "Category:" => "Kategori:",
+        "Chart Type" => "Grafik Türü",
+        "Choose a PNG or JPEG no larger than 16 MB." => "En fazla 16 MB boyutunda bir PNG veya JPEG seçin.",
+        "Colors & Layout" => "Renkler ve Düzen",
+        "Description (optional):" => "Açıklama (isteğe bağlı):",
+        "Don't Save" => "Kaydetme",
+        "Elements" => "Öğeler",
+        "Fill…" => "Doldur…",
+        "Fits inside the selected cell and moves with its content." => "Seçili hücrenin içine sığar ve içeriğiyle birlikte taşınır.",
+        "Formula" => "Formül",
+        "GridCraft is fully drivable by agents. Every menu item, button and gesture is a command:" => {
+            "GridCraft tamamen ajanlar tarafından yönetilebilir. Her menü öğesi, düğme ve hareket bir komuttur:"
+        }
+        "Hidden" => "Gizli",
+        "Indent" => "Girinti",
+        "Join the ArtCraft Discord" => "ArtCraft Discord'una Katılın",
+        "Locking cells or hiding formulas has no effect until you protect the worksheet (Review › Protect Sheet)." => {
+            "Çalışma sayfasını koruyana kadar (Gözden Geçir › Sayfayı Koru) hücreleri kilitlemenin veya formülleri gizlemenin bir etkisi olmaz."
+        }
+        "Name" => "Ad",
+        "No comments on this sheet yet. Select a cell and choose New Comment." => {
+            "Bu sayfada henüz açıklama yok. Bir hücre seçin ve Yeni Açıklama'yı seçin."
+        }
+        "No picture selected" => "Resim seçilmedi",
+        "No ranges yet." => "Henüz aralık yok.",
+        "Orientation (degrees)" => "Yönlendirme (derece)",
+        "Picture file path (PNG or JPEG):" => "Resim dosyası yolu (PNG veya JPEG):",
+        "Ranges that stay editable when the sheet is protected:" => "Sayfa korunduğunda düzenlenebilir kalan aralıklar:",
+        "Return to the original worksheet to insert this picture, or cancel and choose another cell." => {
+            "Bu resmi eklemek için özgün çalışma sayfasına dönün veya iptal edip başka bir hücre seçin."
+        }
+        "Save a copy as" => "Kopyasını farklı kaydet",
+        "Send" => "Gönder",
+        "Show password" => "Parolayı göster",
+        "Start a new workbook" => "Yeni bir çalışma kitabı başlat",
+        "The chart no longer exists." => "Grafik artık mevcut değil.",
+        "There are no shapes, pictures or charts on this sheet." => "Bu sayfada şekil, resim veya grafik yok.",
+        "This workbook" => "Bu çalışma kitabı",
+        "This workbook has no scripts or macros." => "Bu çalışma kitabında betik veya makro yok.",
+        "Type (custom format code):" => "Tür (özel biçim kodu):",
+        "Vertical" => "Dikey",
+        "category" => "kategori",
+        "engine commands are available. See docs/mcp.md and docs/control-protocol.md." => {
+            "motor komutu kullanılabilir. Bkz. docs/mcp.md ve docs/control-protocol.md."
+        }
+        "is protected." => "korumalıdır.",
+        "scope" => "kapsam",
+        "simplex" => "simpleks",
+        "this workbook" => "bu çalışma kitabı",
+        "— VBA project (preserved, not run)" => "— VBA projesi (korunur, çalıştırılmaz)",
+        "Watch\nWindow" => "İzleme\nPenceresi",
+        "Workbook\nStatistics" => "Çalışma Kitabı\nİstatistikleri",
+
+        // Hata Mesajları ve Uyarılar (Engine & UI Error Messages)
+        "Select data for the chart first." => "Önce grafik için veri seçin.",
+        "Select a cell inside a table first, or pass `table`." => "Önce bir tablonun içindeki bir hücreyi seçin veya `table` parametresini verin.",
+        "Select a cell inside a PivotTable first." => "Önce bir PivotTable içindeki bir hücreyi seçin.",
+        "A PivotTable report cannot overlap a table." => "PivotTable raporu bir tabloyla çakışamaz.",
+        "A PivotTable report cannot overlap another PivotTable report." => "PivotTable raporu başka bir PivotTable raporuyla çakışamaz.",
+        "The PivotTable report can't overlap its source data. Choose a different location." => {
+            "PivotTable raporu kaynak verileriyle çakışamaz. Farklı bir konum seçin."
+        }
+        "The PivotTable report is too large." => "PivotTable raporu çok büyük.",
+        "The PivotTable report will not fit on the sheet." => "PivotTable raporu sayfaya sığmıyor.",
+        "The PivotTable report will not fit on the sheet. Choose a different location." => {
+            "PivotTable raporu sayfaya sığmıyor. Farklı bir konum seçin."
+        }
+        "The PivotTable field name is not valid. To create a PivotTable, you must use data that is organized as a list with labeled columns." => {
+            "PivotTable alan adı geçerli değil. PivotTable oluşturmak için sütun etiketleri olan bir liste olarak düzenlenmiş veriler kullanmalısınız."
+        }
+        "The source range is too large for a PivotTable." => "Kaynak aralığı bir PivotTable için çok büyük.",
+        "The table needs a header row to be used as a PivotTable source." => {
+            "Tablonun PivotTable kaynağı olarak kullanılabilmesi için üst bilgi satırı olmalıdır."
+        }
+        "The formula has an unterminated field name." => "Formülde kapatılmamış bir alan adı var.",
+        "The formula has an unterminated text value." => "Formülde kapatılmamış bir metin değeri var.",
+        "The formula is empty." => "Formül boş.",
+        "The formula is too long." => "Formül çok uzun.",
+        "A sheet name can't be blank." => "Sayfa adı boş olamaz.",
+        "A sheet name can't be longer than 31 characters." => "Sayfa adı 31 karakterden uzun olamaz.",
+        "A sheet name can't begin or end with an apostrophe." => "Sayfa adı kesme işaretiyle başlayamaz veya bitemez.",
+        "A sheet name can't contain any of these characters: : \\ / ? * [ ]" => "Sayfa adı şu karakterlerden hiçbirini içeremez: : \\ / ? * [ ]",
+        "That name is already taken. Try a different one." => "Bu ad zaten kullanılıyor. Farklı bir ad deneyin.",
+        "\"History\" is a reserved name." => "\"History\" ayrılmış bir addır.",
+        "A table can't overlap another table." => "Bir tablo başka bir tabloyla çakışamaz.",
+        "A workbook must contain at least one visible worksheet." => "Çalışma kitabı en az bir görünür çalışma sayfası içermelidir.",
+        "Anova needs at least two groups, each with at least one number." => "Anova için her birinde en az bir sayı bulunan en az iki grup gerekir.",
+        "Cell must contain a formula." => "Hücre bir formül içermelidir.",
+        "Cell must contain a value." => "Hücre bir değer içermelidir.",
+        "Column width must be between 0 and 255 characters." => "Sütun genişliği 0 ile 255 karakter arasında olmalıdır.",
+        "Row height must be between 0 and 409 points." => "Satır yüksekliği 0 ile 409 nokta arasında olmalıdır.",
+        "The number must be between 1 and 409." => "Sayı 1 ile 409 arasında olmalıdır.",
+        "Constraint cells must be on the objective cell's sheet." => "Kısıtlama hücreleri hedef hücrenin sayfasında olmalıdır.",
+        "Each input range needs at least two numbers." => "Her giriş aralığında en az iki sayı olmalıdır.",
+        "Excel 97-2003 (.xls) is supported for import only. Save as .xlsx or another supported export format." => {
+            "Excel 97-2003 (.xls) yalnızca içeri aktarma için desteklenir. .xlsx veya desteklenen başka bir biçimde kaydedin."
+        }
+        "ODS is supported for data import only. Save as .xlsx or another supported export format." => {
+            "ODS yalnızca veri içeri aktarma için desteklenir. .xlsx veya desteklenen başka bir biçimde kaydedin."
+        }
+        "XLSB is supported for data import only. Save as .xlsx or another supported export format." => {
+            "XLSB yalnızca veri içeri aktarma için desteklenir. .xlsx veya desteklenen başka bir biçimde kaydedin."
+        }
+        "Exporting needs a file picker, which this window doesn't have." => "Dışarı aktarma için bu pencerede bulunmayan bir dosya seçici gerekir.",
+        "Printing is unavailable here; export a PDF instead." => "Yazdırma burada kullanılamıyor; bunun yerine PDF olarak dışarı aktarın.",
+        "Select an available printer in File > Print before submitting." => {
+            "Göndermeden önce Dosya > Yazdır bölümünden kullanılabilir bir yazıcı seçin."
+        }
+        "Input Y range and input X range must have the same number of rows." => {
+            "Giriş Y aralığı ve giriş X aralığı aynı satır sayısına sahip olmalıdır."
+        }
+        "Input Y range must be a single column." => "Giriş Y aralığı tek bir sütun olmalıdır.",
+        "Input cell reference is not valid." => "Giriş hücresi başvurusu geçerli değil.",
+        "Input range contains non-numeric data." => "Giriş aralığı sayısal olmayan veriler içeriyor.",
+        "Input range must be a single row or column." => "Giriş aralığı tek bir satır veya sütun olmalıdır.",
+        "Input ranges must have the same number of values." => "Giriş aralıkları aynı sayıda değere sahip olmalıdır.",
+        "Insert Cut Cells works on whole rows or columns; cut whole rows or columns, or use Paste." => {
+            "Kesilen Hücreleri Ekle yalnızca tam satır veya sütunlarda çalışır; tam satır veya sütun kesin ya da Yapıştır'ı kullanın."
+        }
+        "Integer and binary constraints must be on variable cells." => "Tamsayı ve ikili kısıtlamalar değişken hücrelerde olmalıdır.",
+        "Multi-cell array formulas aren't allowed in tables." => "Tablolarda çok hücreli dizi formüllerine izin verilmez.",
+        "No cells were found." => "Hiçbir hücre bulunamadı.",
+        "No dictionary is available on this system (GridCraft uses the system word list)." => {
+            "Bu sistemde kullanılabilir sözlük yok (GridCraft sistem sözcük listesini kullanır)."
+        }
+        "No sheets are hidden." => "Gizli sayfa yok.",
+        "Nothing to import." => "İçeri aktarılacak bir şey yok.",
+        "Nothing to paste." => "Yapıştırılacak bir şey yok.",
+        "Pick up a format first." => "Önce bir biçim kopyalayın.",
+        "Reference isn't valid." => "Başvuru geçerli değil.",
+        "The reference isn't valid." => "Başvuru geçerli değil.",
+        "Select a timeline column and a values column for the forecast." => "Tahmin için bir zaman çizelgesi sütunu ve bir değer sütunu seçin.",
+        "The Evolutionary method isn't available; use GRG Nonlinear or Simplex LP." => {
+            "Evrimsel yöntem kullanılamıyor; GRG Doğrusal Olmayan veya Simpleks LP kullanın."
+        }
+        "The X variables are collinear; the regression can't be computed." => "X değişkenleri doğrusal bağımlı; regresyon hesaplanamıyor.",
+        "The bin range holds no numbers." => "Göz aralığında sayı yok.",
+        "The cell has no formula." => "Hücrede formül yok.",
+        "The cell you're trying to change is on a protected sheet." => "Değiştirmeye çalıştığınız hücre korumalı bir sayfada.",
+        "The consolidated data doesn't fit below and right of the destination." => "Birleştirilen veriler hedefin altına ve sağına sığmıyor.",
+        "The constraint's two sides must be the same size (or the right side one cell)." => {
+            "Kısıtlamanın iki tarafı aynı boyutta olmalıdır (veya sağ taraf tek bir hücre olmalıdır)."
+        }
+        "The copied cells don't fit on the sheet at this position." => "Kopyalanan hücreler bu konumda sayfaya sığmıyor.",
+        "The copied sheet no longer exists." => "Kopyalanan sayfa artık mevcut değil.",
+        "The copy area is the whole sheet; there is no room to insert it." => "Kopyalama alanı tüm sayfadır; eklenecek yer yok.",
+        "The cut rows or columns can't be inserted inside themselves." => "Kesilen satırlar veya sütunlar kendi içlerine eklenemez.",
+        "The damping factor must be between 0 and 1." => "Sönümleme katsayısı 0 ile 1 arasında olmalıdır.",
+        "The extract range can't overlap the list range." => "Çıkarma aralığı liste aralığıyla çakışamaz.",
+        "The file is empty." => "Dosya boş.",
+        "The forecast end must be after the last point of the timeline." => "Tahmin bitişi zaman çizelgesinin son noktasından sonra olmalıdır.",
+        "The headers must remain in the same row, and the resulting table range must overlap the original table range." => {
+            "Üst bilgiler aynı satırda kalmalı ve ortaya çıkan tablo aralığı özgün tablo aralığıyla çakışmalıdır."
+        }
+        "The input range holds no numbers." => "Giriş aralığında sayı yok.",
+        "The interval must be a whole number from 1 to the number of data points." => {
+            "Aralık, 1 ile veri noktası sayısı arasında bir tam sayı olmalıdır."
+        }
+        "The name entered already exists. Enter a unique name." => "Girilen ad zaten mevcut. Benzersiz bir ad girin.",
+        "The name that you entered is not valid." => "Girdiğiniz ad geçerli değil.",
+        "The objective cell must contain a formula." => "Hedef hücre bir formül içermelidir.",
+        "The objective must be a single cell." => "Hedef tek bir hücre olmalıdır.",
+        "The password you supplied is not correct." => "Girdiğiniz parola doğru değil.",
+        "The password is incorrect." => "Parola yanlış.",
+        "the password is incorrect" => "parola yanlış",
+        "is password-protected. Enter its password to open it." => "parola korumalıdır. Açmak için parolasını girin.",
+        "This workbook was password-protected. GridCraft saves it without the password." => {
+            "Bu çalışma kitabı parola korumalıydı. GridCraft onu parola olmadan kaydeder."
+        }
+        "this .xls workbook is password-protected (encrypted). GridCraft can't open encrypted .xls files; remove the password in Excel and try again." => {
+            "bu .xls çalışma kitabı parola korumalıdır (şifrelenmiş). GridCraft şifrelenmiş .xls dosyalarını açamaz; Excel'de parolayı kaldırıp tekrar deneyin."
+        }
+        "The report doesn't fit on the sheet below and right of the output cell." => {
+            "Rapor, çıkış hücresinin altındaki ve sağındaki sayfaya sığmıyor."
+        }
+        "The sheet is protected with a password. Unprotect it first (Review › Unprotect Sheet)." => {
+            "Sayfa parolayla korunuyor. Önce korumayı kaldırın (Gözden Geçir › Sayfa Korumasını Kaldır)."
+        }
+        "The text box's worksheet is no longer active." => "Metin kutusunun çalışma sayfası artık etkin değil.",
+        "The timeline needs at least two points a constant step apart." => "Zaman çizelgesi sabit aralıklı en az iki noktaya ihtiyaç duyar.",
+        "The variable cells must be a reference like B2:B4." => "Değişken hücreler B2:B4 gibi bir başvuru olmalıdır.",
+        "The variable cells must be on the objective cell's sheet." => "Değişken hücreler hedef hücrenin sayfasında olmalıdır.",
+        "The workbook is protected and cannot be changed." => "Çalışma kitabı korumalıdır ve değiştirilemez.",
+        "There are no comments in this workbook." => "Bu çalışma kitabında açıklama yok.",
+        "there are no comments in this workbook" => "bu çalışma kitabında açıklama yok",
+        "There are no scenarios on this sheet." => "Bu sayfada senaryo yok.",
+        "There are no values to forecast." => "Tahmin edilecek değer yok.",
+        "There's a problem with this formula." => "Bu formülde bir sorun var.",
+        "There's no comment in this cell." => "Bu hücrede açıklama yok.",
+        "There's no room below the selection for the totals." => "Seçimin altında toplamlar için yer yok.",
+        "This action won't work on multiple selections." => "Bu eylem çoklu seçimlerde çalışmaz.",
+        "This operation isn't allowed: it would shift cells in a table on your worksheet." => {
+            "Bu işleme izin verilmiyor: çalışma sayfanızdaki bir tablodaki hücreleri kaydırır."
+        }
+        "This sheet has no saved Solver model." => "Bu sayfada kayıtlı Çözücü modeli yok.",
+        "To do this, all the merged cells need to be the same size." => "Bunu yapmak için birleştirilmiş hücrelerin tümü aynı boyutta olmalıdır.",
+        "To prevent possible loss of data, Excel cannot shift nonblank cells off of the worksheet." => {
+            "Olası veri kaybını önlemek için boş olmayan hücreler çalışma sayfasının dışına kaydırılamaz."
+        }
+        "To prevent possible loss of data, cells can't be pushed off the end of the worksheet." => {
+            "Olası veri kaybını önlemek için hücreler çalışma sayfasının sonundan dışarı itilemez."
+        }
+        "To prevent possible loss of data, columns cannot be shifted off of the worksheet." => {
+            "Olası veri kaybını önlemek için sütunlar çalışma sayfasının dışına kaydırılamaz."
+        }
+        "Too few observations for this many X variables." => "Bu kadar çok X değişkeni için gözlem sayısı çok az.",
+        "Unprotect the sheet to change its edit ranges." => "Düzenleme aralıklarını değiştirmek için sayfa korumasını kaldırın.",
+        "Variable cells must hold constants, not formulas." => "Değişken hücreler formül değil sabit değer içermelidir.",
+        "We looked at all the data next to your selection and didn't see a pattern for filling in values for you." => {
+            "Seçiminizin yanındaki tüm verilere baktık ancak değerleri doldurmak için bir örüntü göremedik."
+        }
+        "no filter" => "filtre yok",
+        "no such sheet" => "böyle bir sayfa yok",
+        "no workbook open" => "açık çalışma kitabı yok",
+        "not found" => "bulunamadı",
+        "nothing to redo" => "yinelenecek işlem yok",
+        "nothing to undo" => "geri alınacak işlem yok",
+        "the clipboard is empty" => "pano boş",
+        "files larger than 2 GB aren't supported" => "2 GB'tan büyük dosyalar desteklenmiyor",
+        "nonlinear" => "doğrusal olmayan",
+        "error" => "hata",
+
+        // İşlev Açıklamaları (All 488 Function Descriptions)
+        "1 for positive, -1 for negative and 0 for zero." => "Pozitif için 1, negatif için -1 ve sıfır için 0 döndürür.",
+        "A random integer between two bounds, inclusive." => "İki sınır arasında (sınırlar dahil) rastgele bir tamsayı döndürür.",
+        "A random number between 0 and 1, recalculated every time." => "Her hesaplamada yenilenen, 0 ile 1 arasında rastgele bir sayı döndürür.",
+        "A range or array without its blank outer rows and columns." => "Dıştaki boş satır ve sütunları kırpılmış aralık veya dizi döndürür.",
+        "A reference shifted from a starting point." => "Başlangıç noktasından kaydırılmış bir başvuru döndürür.",
+        "A statistic of the FORECAST.ETS model: 1 alpha, 2 beta, 3 gamma, 4 MASE, 5 SMAPE, 6 MAE, 7 RMSE, 8 step size." => {
+            "TAHMİN.ETS modelinin istatistiğini döndürür: 1 alfa, 2 beta, 3 gama, 4 MASE, 5 SMAPE, 6 MAE, 7 RMSE, 8 adım boyutu."
+        }
+        "A subtotal that can skip hidden rows." => "Gizli satırları atlayabilen bir alt toplam döndürür.",
+        "Absolute value (modulus) of a complex number." => "Karmaşık bir sayının mutlak değerini (modülünü) döndürür.",
+        "Absolute value of a number." => "Bir sayının mutlak değerini döndürür.",
+        "Accrued interest of a security paying interest at maturity." => "Vade sonunda faiz ödeyen bir menkul kıymetin birikmiş faizini döndürür.",
+        "Accrued interest of a security paying periodic interest." => "Dönemsel faiz ödeyen bir menkul kıymetin birikmiş faizini döndürür.",
+        "Accumulates an array into one value." => "Bir diziyi tek bir değerde biriktirir (indirger).",
+        "Adds all the numbers in the arguments." => "Bağımsız değişkenlerdeki tüm sayıları toplar.",
+        "Adds the cells that meet a condition." => "Belirli bir koşulu karşılayan hücreleri toplar.",
+        "Adds the cells that meet every condition." => "Tüm koşulları karşılayan hücreleri toplar.",
+        "Adds the numbers in a field of the records that meet the criteria." => "Ölçütleri karşılayan kayıtların bir alanındaki sayıları toplar.",
+        "Adds the squares of the numbers." => "Sayıların karelerini toplar.",
+        "Adds two numbers." => "İki sayıyı toplar.",
+        "Amount received at maturity for a fully invested security." => "Tam yatırımlı bir menkul kıymet için vade sonunda alınan tutarı döndürür.",
+        "An aggregate that can skip hidden rows and errors." => "Gizli satırları ve hataları atlayabilen bir toplama sonucu döndürür.",
+        "Angle of a complex number in radians." => "Karmaşık bir sayının radyan cinsinden açısını döndürür.",
+        "Angle of the point (x, y) from the x-axis in radians." => "(x, y) noktasının x ekseniyle yaptığı açıyı radyan cinsinden döndürür.",
+        "Annual yield of a discounted security." => "İskontolu bir menkul kıymetin yıllık getirisini döndürür.",
+        "Annual yield of a security paying interest at maturity." => "Vade sonunda faiz ödeyen bir menkul kıymetin yıllık getirisini döndürür.",
+        "Applies a LAMBDA to each column." => "Her sütuna bir LAMBDA işlevi uygular.",
+        "Applies a LAMBDA to each row." => "Her satıra bir LAMBDA işlevi uygular.",
+        "Applies a LAMBDA to each value." => "Her değere bir LAMBDA işlevi uygular.",
+        "Approximate lookup in a sorted vector or the first row/column of an array." => {
+            "Sıralı bir vektörde veya bir dizinin ilk satır/sütununda yaklaşık arama yapar."
+        }
+        "Arccosine in radians." => "Radyan cinsinden arkkosinüsü döndürür.",
+        "Arccotangent in radians (0 to pi)." => "Radyan cinsinden arkkotanjantı (0 ile pi arası) döndürür.",
+        "Arcsine in radians." => "Radyan cinsinden arksinüsü döndürür.",
+        "Arctangent in radians." => "Radyan cinsinden arktanjantı döndürür.",
+        "Arithmetic mean of the numbers." => "Sayıların aritmetik ortalamasını döndürür.",
+        "Average absolute deviation from the mean." => "Ortalamadan mutlak sapmaların ortalamasını döndürür.",
+        "Average of the cells that meet a condition." => "Belirli bir koşulu karşılayan hücrelerin ortalamasını döndürür.",
+        "Average of the cells that meet every condition." => "Tüm koşulları karşılayan hücrelerin ortalamasını döndürür.",
+        "Averages the numbers in a field of the records that meet the criteria." => {
+            "Ölçütleri karşılayan kayıtların bir alanındaki sayıların ortalamasını alır."
+        }
+        "Base-10 logarithm of a complex number." => "Karmaşık bir sayının 10 tabanında logaritmasını döndürür.",
+        "Base-10 logarithm." => "10 tabanında logaritmayı döndürür.",
+        "Base-2 logarithm of a complex number." => "Karmaşık bir sayının 2 tabanında logaritmasını döndürür.",
+        "Bessel function of the first kind, J_n(x)." => "Birinci tür Bessel işlevini (J_n(x)) döndürür.",
+        "Bessel function of the second kind, Y_n(x)." => "İkinci tür Bessel işlevini (Y_n(x)) döndürür.",
+        "Beta distribution density or probability." => "Beta dağılımı yoğunluğunu veya olasılığını döndürür.",
+        "Binomial probability." => "Binom dağılımı olasılığını döndürür.",
+        "Bitwise AND of two non-negative integers." => "Negatif olmayan iki tamsayının bit düzeyinde VE (AND) sonucunu döndürür.",
+        "Bitwise OR of two non-negative integers." => "Negatif olmayan iki tamsayının bit düzeyinde VEYA (OR) sonucunu döndürür.",
+        "Bitwise exclusive OR of two non-negative integers." => "Negatif olmayan iki tamsayının bit düzeyinde ÖZEL VEYA (XOR) sonucunu döndürür.",
+        "Bond-equivalent yield of a Treasury bill." => "Bir Hazine bonosunun tahvil eşdeğeri getirisini döndürür.",
+        "Breaks a row or column into columns of the given length." => "Bir satırı veya sütunu belirtilen uzunlukta sütunlara böler.",
+        "Breaks a row or column into rows of the given length." => "Bir satırı veya sütunu belirtilen uzunlukta satırlara böler.",
+        "Builds a cell address as text from row and column numbers." => "Satır ve sütun numaralarından metin olarak bir hücre adresi oluşturur.",
+        "Builds a complex number as text from real and imaginary parts." => "Gerçek ve sanal kısımlardan metin olarak bir karmaşık sayı oluşturur.",
+        "Builds a date serial number from a year, month and day." => "Yıl, ay ve günden bir tarih seri numarası oluşturur.",
+        "Builds a summary table grouping values by row and column fields." => {
+            "Değerleri satır ve sütun alanlarına göre gruplandırarak bir özet tablo oluşturur."
+        }
+        "Builds a time (a fraction of a day) from hours, minutes and seconds." => "Saat, dakika ve saniyeden bir zaman (günün kesri) oluşturur.",
+        "Builds an array from a LAMBDA." => "Bir LAMBDA işlevinden dizi oluşturur.",
+        "Builds an array of evenly stepped numbers." => "Eşit aralıklı sayılardan oluşan bir dizi oluşturur.",
+        "Builds an array of random numbers in a range." => "Belirli bir aralıkta rastgele sayılardan oluşan bir dizi oluşturur.",
+        "Byte version of FIND." => "BUL (FIND) işlevinin bayt tabanlı sürümü.",
+        "Byte version of LEFT (same as LEFT for single-byte text)." => "SOLDAN (LEFT) işlevinin bayt tabanlı sürümü.",
+        "Byte version of LEN (same as LEN for single-byte text)." => "UZUNLUK (LEN) işlevinin bayt tabanlı sürümü.",
+        "Byte version of MID (same as MID for single-byte text)." => "PARÇAAL (MID) işlevinin bayt tabanlı sürümü.",
+        "Byte version of REPLACE." => "DEĞİŞTİR (REPLACE) işlevinin bayt tabanlı sürümü.",
+        "Byte version of RIGHT (same as RIGHT for single-byte text)." => "SAĞDAN (RIGHT) işlevinin bayt tabanlı sürümü.",
+        "Byte version of SEARCH." => "MBUL (SEARCH) işlevinin bayt tabanlı sürümü.",
+        "Capitalises the first letter of each word and lower-cases the rest." => "Her sözcüğün ilk harfini büyük, geri kalanını küçük harfe çevirir.",
+        "Chi-squared density or left-tailed probability." => "Ki-kare yoğunluğunu veya sol kuyruklu olasılığını döndürür.",
+        "Chi-squared test of independence." => "Ki-kare bağımsızlık testini döndürür.",
+        "Column number of a reference." => "Bir başvurunun sütun numarasını döndürür.",
+        "Compares an expression with a list of values and returns the result paired with the first match." => {
+            "Bir ifadeyi değer listesiyle karşılaştırır ve ilk eşleşmeyle eşlenen sonucu döndürür."
+        }
+        "Complementary error function, 1 - ERF(x)." => "Tamamlayıcı hata işlevini (1 - HATAİŞLEV(x)) döndürür.",
+        "Complex conjugate of a complex number." => "Karmaşık bir sayının karmaşık eşleniğini döndürür.",
+        "Confidence interval half-width using Student's t distribution." => {
+            "Student t dağılımını kullanarak güven aralığı yarı genişliğini döndürür."
+        }
+        "Confidence interval half-width using the normal distribution." => "Normal dağılımı kullanarak güven aralığı yarı genişliğini döndürür.",
+        "Converts Roman numerals to a number." => "Romen rakamlarını sayıya dönüştürür.",
+        "Converts a binary number to decimal." => "İkili bir sayıyı onluğa dönüştürür.",
+        "Converts a binary number to hexadecimal." => "İkili bir sayıyı onaltılığa dönüştürür.",
+        "Converts a binary number to octal." => "İkili bir sayıyı sekizliğe dönüştürür.",
+        "Converts a date written as text into a date serial number." => "Metin olarak yazılmış bir tarihi tarih seri numarasına dönüştürür.",
+        "Converts a decimal number to binary." => "Onluk bir sayıyı ikiliye dönüştürür.",
+        "Converts a decimal number to hexadecimal." => "Onluk bir sayıyı onaltılığa dönüştürür.",
+        "Converts a decimal number to octal." => "Onluk bir sayıyı sekizliğe dönüştürür.",
+        "Converts a decimal price to fractional notation." => "Ondalık bir fiyatı kesirli gösterime dönüştürür.",
+        "Converts a fractional price notation to a decimal number." => "Kesirli bir fiyat gösterimini ondalık sayıya dönüştürür.",
+        "Converts a hexadecimal number to binary." => "Onaltılık bir sayıyı ikiliye dönüştürür.",
+        "Converts a hexadecimal number to decimal." => "Onaltılık bir sayıyı onluğa dönüştürür.",
+        "Converts a hexadecimal number to octal." => "Onaltılık bir sayıyı sekizliğe dönüştürür.",
+        "Converts a measurement from one unit to another." => "Bir ölçümü bir birimden diğerine dönüştürür.",
+        "Converts a number to Roman numerals in one of five styles." => "Bir sayıyı beş stilden birinde Romen rakamlarına dönüştürür.",
+        "Converts a time written as text into a fraction of a day." => "Metin olarak yazılmış bir zamanı günün kesrine dönüştürür.",
+        "Converts a value to a number: numbers stay, TRUE is 1, everything else is 0." => {
+            "Bir değeri sayıya dönüştürür: sayılar kalır, DOĞRU 1 olur, diğer her şey 0 olur."
+        }
+        "Converts an array to text, either as a comma list or as a strict array constant." => {
+            "Bir diziyi liste veya dizi sabiti biçiminde metne dönüştürür."
+        }
+        "Converts an octal number to binary." => "Sekizlik bir sayıyı ikiliye dönüştürür.",
+        "Converts an octal number to decimal." => "Sekizlik bir sayıyı onluğa dönüştürür.",
+        "Converts an octal number to hexadecimal." => "Sekizlik bir sayıyı onaltılığa dönüştürür.",
+        "Converts any value to text, optionally in strict (quoted) form." => {
+            "Herhangi bir değeri (isteğe bağlı olarak tırnaklı biçimde) metne dönüştürür."
+        }
+        "Converts between the euro and the former euro member currencies at the fixed rates." => {
+            "Sabit kurlar üzerinden Euro ile eski üye para birimleri arasında dönüştürme yapar."
+        }
+        "Converts degrees to radians." => "Dereceyi radyana dönüştürür.",
+        "Converts full-width characters to half-width (no change for single-byte text)." => "Tam genişlikli karakterleri yarım genişliğe dönüştürür.",
+        "Converts half-width characters to full-width (no change in this locale)." => "Yarım genişlikli karakterleri tam genişliğe dönüştürür.",
+        "Converts radians to degrees." => "Radyanı dereceye dönüştürür.",
+        "Converts text that looks like a number, date or time into a number." => "Sayı, tarih veya saat görünümündeki metni sayıya dönüştürür.",
+        "Converts text to a number using the given decimal and group separators." => {
+            "Belirtilen ondalık ve grup ayırıcılarını kullanarak metni sayıya dönüştürür."
+        }
+        "Converts text to lower case." => "Metni küçük harfe çevirir.",
+        "Converts text to upper case." => "Metni büyük harfe çevirir.",
+        "Correlation coefficient of two data sets." => "İki veri kümesinin korelasyon katsayısını döndürür.",
+        "Cosecant of a complex number." => "Karmaşık bir sayının kosekantını döndürür.",
+        "Cosecant of an angle in radians." => "Radyan cinsinden bir açının kosekantını döndürür.",
+        "Cosine of a complex number." => "Karmaşık bir sayının kosinüsünü döndürür.",
+        "Cosine of an angle in radians." => "Radyan cinsinden bir açının kosinüsünü döndürür.",
+        "Cotangent of a complex number." => "Karmaşık bir sayının kotanjantını döndürür.",
+        "Cotangent of an angle in radians." => "Radyan cinsinden bir açının kotanjantını döndürür.",
+        "Counts days between two dates on a 360-day year (US or European method)." => {
+            "360 günlük yıl esasına göre (ABD veya Avrupa yöntemi) iki tarih arasındaki günleri sayar."
+        }
+        "Counts empty cells and empty text in a range." => "Bir aralıktaki boş hücreleri ve boş metinleri sayar.",
+        "Counts how many values fall into each bin, as a vertical array." => "Her göze kaç değerin düştüğünü dikey bir dizi olarak sayar.",
+        "Counts non-blank cells in a field of the matching records (or the matching records)." => {
+            "Eşleşen kayıtların bir alanındaki boş olmayan hücreleri sayar."
+        }
+        "Counts numeric cells in a field of the matching records (or the matching records)." => {
+            "Eşleşen kayıtların bir alanındaki sayısal hücreleri sayar."
+        }
+        "Counts the cells that meet a condition." => "Belirli bir koşulu karşılayan hücreleri sayar.",
+        "Counts the cells that meet every condition." => "Tüm koşulları karşılayan hücreleri sayar.",
+        "Counts the characters in a text." => "Bir metindeki karakter sayısını sayar.",
+        "Counts the columns in an array or range." => "Bir dizi veya aralıktaki sütun sayısını sayar.",
+        "Counts the items in a cube set (no cube connections; #N/A)." => "Bir küp kümesindeki öğeleri sayar (küp bağlantısı yok; #YOK).",
+        "Counts the non-empty values." => "Boş olmayan değerleri sayar.",
+        "Counts the numbers." => "Sayıları sayar.",
+        "Counts the rows in an array or range." => "Bir dizi veya aralıktaki satır sayısını sayar.",
+        "Counts whole years, months or days between two dates. unit: Y, M, D, MD, YM or YD." => {
+            "İki tarih arasındaki tam yılları, ayları veya günleri sayar. Birim: Y, M, D, MD, YM veya YD."
+        }
+        "Counts working days (Monday to Friday) between two dates, excluding holidays." => {
+            "Tatiller hariç, iki tarih arasındaki iş günlerini (Pazartesi-Cuma) sayar."
+        }
+        "Counts working days between two dates with a custom weekend, excluding holidays." => {
+            "Özel hafta sonu ve tatiller hariç, iki tarih arasındaki iş günlerini sayar."
+        }
+        "Creates a link; the cell shows the friendly name, or the link itself." => {
+            "Bir bağlantı oluşturur; hücrede görünen ad veya bağlantının kendisi gösterilir."
+        }
+        "Creates a reusable custom function." => "Yeniden kullanılabilir özel bir işlev oluşturur.",
+        "Cumulative beta probability." => "Kümülatif beta olasılığını döndürür.",
+        "Cumulative lognormal probability." => "Kümülatif lognormal olasılığını döndürür.",
+        "Cuts off the fractional part of a number at the given digits." => "Bir sayının kesirli kısmını belirtilen basamakta keser.",
+        "Days from settlement to the next coupon date." => "Teslim tarihinden bir sonraki kupon tarihine kadar olan gün sayısını döndürür.",
+        "Days from the start of the coupon period to settlement." => {
+            "Kupon döneminin başlangıcından teslim tarihine kadar olan gün sayısını döndürür."
+        }
+        "Days in the coupon period that contains settlement." => "Teslim tarihini içeren kupon dönemindeki gün sayısını döndürür.",
+        "Declining-balance depreciation over any span of periods, switching to straight line." => {
+            "Doğrusal amortismana geçiş yaparak, herhangi bir dönem aralığı için azalan bakiyeler amortismanını döndürür."
+        }
+        "Defines a set of cube members (no cube connections; #N/A)." => "Bir küp üyeleri kümesi tanımlar (küp bağlantısı yok; #YOK).",
+        "Determinant of a square matrix." => "Bir kare matrisin determinantını döndürür.",
+        "Difference of two complex numbers." => "İki karmaşık sayının farkını döndürür.",
+        "Discount rate of a security." => "Bir menkul kıymetin iskonto oranını döndürür.",
+        "Double factorial of a number." => "Bir sayının çift faktöriyelini döndürür.",
+        "Double-declining-balance (or other factor) depreciation for a period." => {
+            "Bir dönem için çift azalan bakiye (veya başka bir çarpan) amortismanını döndürür."
+        }
+        "Effective annual rate from a nominal rate and compounding periods." => {
+            "Nominal oran ve bileşik faiz dönemlerinden etkin yıllık faiz oranını döndürür."
+        }
+        "Equivalent interest rate for the growth of an investment." => "Bir yatırımın büyümesi için eşdeğer faiz oranını döndürür.",
+        "Error function integrated from 0 to a limit, or between two limits." => {
+            "0'dan bir sınıra veya iki sınır arasında tümlevlenmiş hata işlevini döndürür."
+        }
+        "Error function integrated from 0 to x." => "0'dan x'e kadar tümlevlenmiş hata işlevini döndürür.",
+        "Excess kurtosis of a sample." => "Bir örneklemin basıklığını (kurtosis) döndürür.",
+        "Exponential curve coefficients and optional regression statistics." => {
+            "Üstel eğri katsayılarını ve isteğe bağlı regresyon istatistiklerini döndürür."
+        }
+        "Exponential distribution density or probability." => "Üstel dağılım yoğunluğunu veya olasılığını döndürür.",
+        "Exponential of a complex number." => "Karmaşık bir sayının üstel değerini döndürür.",
+        "Extracts data from XML with an XPath (not available; returns #VALUE!)." => {
+            "Bir XPath ile XML'den veri çıkarır (kullanılamıyor; #DEĞER! döndürür)."
+        }
+        "Extracts the first match, all matches or the capture groups of a regular expression." => {
+            "Bir düzenli ifadenin ilk eşleşmesini, tüm eşleşmelerini veya yakalama gruplarını çıkarır."
+        }
+        "F distribution density or left-tailed probability." => "F dağılımı yoğunluğunu veya sol kuyruklu olasılığını döndürür.",
+        "Factorial of a number." => "Bir sayının faktöriyelini döndürür.",
+        "Fetches data from a web service (not available; returns #VALUE!)." => "Bir web hizmetinden veri alır (kullanılamıyor; #DEĞER! döndürür).",
+        "Finds a value in the first column of a table and returns the value in the same row of another column." => {
+            "Bir tablonun ilk sütununda bir değer bulur ve başka bir sütunun aynı satırındaki değeri döndürür."
+        }
+        "Finds a value in the first row of a table and returns the value in the same column of another row." => {
+            "Bir tablonun ilk satırında bir değer bulur ve başka bir satırın aynı sütunundaki değeri döndürür."
+        }
+        "Finds the position of one text in another (case-sensitive)." => {
+            "Bir metnin başka bir metin içindeki konumunu bulur (büyük/küçük harf duyarlı)."
+        }
+        "Finds the position of one text in another, ignoring case and allowing wildcards." => {
+            "Büyük/küçük harfi yoksayarak ve joker karakterlere izin vererek bir metnin diğerindeki konumunu bulur."
+        }
+        "Fisher transformation." => "Fisher dönüşümünü döndürür.",
+        "Fixed-declining-balance depreciation for a period." => "Bir dönem için sabit azalan bakiye amortismanını döndürür.",
+        "Flattens an array into a single column, optionally skipping blanks or errors." => {
+            "İsteğe bağlı olarak boşlukları veya hataları atlayarak bir diziyi tek sütuna düzleştirir."
+        }
+        "Flattens an array into a single row, optionally skipping blanks or errors." => {
+            "İsteğe bağlı olarak boşlukları veya hataları atlayarak bir diziyi tek satıra düzleştirir."
+        }
+        "Forecasts a value by additive (AAA) exponential smoothing." => "Toplamsal (AAA) üstel düzeltme ile bir değeri tahmin eder.",
+        "Formats a number as currency text." => "Bir sayıyı para birimi metni olarak biçimlendirir.",
+        "Formats a number as text." => "Bir sayıyı metin olarak biçimlendirir.",
+        "French degressive depreciation with a life-based coefficient." => "Ömür tabanlı katsayılı Fransız azalan amortismanını döndürür.",
+        "French linear depreciation prorated for the first period." => {
+            "İlk dönem için kıstelyevm uygulanmış Fransız doğrusal amortismanını döndürür."
+        }
+        "Future value of a principal after a series of compound rates." => {
+            "Bir dizi bileşik faiz oranından sonra anaparanın gelecekteki değerini döndürür."
+        }
+        "Future value of an investment with constant payments and rate." => {
+            "Sabit ödemeli ve sabit oranlı bir yatırımın gelecekteki değerini döndürür."
+        }
+        "Gamma distribution density or probability." => "Gama dağılımı yoğunluğunu veya olasılığını döndürür.",
+        "Geometric mean of positive numbers." => "Pozitif sayıların geometrik ortalamasını döndürür.",
+        "Greatest common divisor of integers." => "Tamsayıların en büyük ortak bölenini (EBOB) döndürür.",
+        "Groups rows by key fields and aggregates the values of each group." => {
+            "Satırları anahtar alanlara göre gruplandırır ve her grubun değerlerini toplar."
+        }
+        "Grows an array to the given size, filling new cells with a pad value." => {
+            "Yeni hücreleri dolgu değeriyle doldurarak bir diziyi belirtilen boyuta büyütür."
+        }
+        "Half-width of the confidence interval around a FORECAST.ETS value." => {
+            "Bir TAHMİN.ETS değerinin etrafındaki güven aralığının yarı genişliğini döndürür."
+        }
+        "Harmonic mean of positive numbers." => "Pozitif sayıların harmonik ortalamasını döndürür.",
+        "Hyperbolic cosecant of a complex number." => "Karmaşık bir sayının hiperbolik kosekantını döndürür.",
+        "Hyperbolic cosecant." => "Hiperbolik kosekantı döndürür.",
+        "Hyperbolic cosine of a complex number." => "Karmaşık bir sayının hiperbolik kosinüsünü döndürür.",
+        "Hyperbolic cosine." => "Hiperbolik kosinüsü döndürür.",
+        "Hyperbolic cotangent." => "Hiperbolik kotanjantı döndürür.",
+        "Hyperbolic secant of a complex number." => "Karmaşık bir sayının hiperbolik sekantını döndürür.",
+        "Hyperbolic secant." => "Hiperbolik sekantı döndürür.",
+        "Hyperbolic sine of a complex number." => "Karmaşık bir sayının hiperbolik sinüsünü döndürür.",
+        "Hyperbolic sine." => "Hiperbolik sinüsü döndürür.",
+        "Hyperbolic tangent." => "Hiperbolik tanjantı döndürür.",
+        "Hypergeometric probability of an exact count." => "Tam bir sayım için hipergeometrik olasılığı döndürür.",
+        "Hypergeometric probability." => "Hipergeometrik olasılığı döndürür.",
+        "Identity matrix of the given size." => "Belirtilen boyutta birim matrisi döndürür.",
+        "Imaginary coefficient of a complex number." => "Karmaşık bir sayının sanal katsayısını döndürür.",
+        "Information about a cell." => "Bir hücre hakkında bilgi döndürür.",
+        "Integer part of a division." => "Bir bölme işleminin tamsayı kısmını döndürür.",
+        "Interest paid in a period of a loan with even principal payments." => {
+            "Eşit anapara ödemeli bir kredinin belirli bir döneminde ödenen faizi döndürür."
+        }
+        "Interest part of a given period's payment." => "Belirli bir dönem ödemesinin faiz kısmını döndürür.",
+        "Interest rate of a fully invested security." => "Tam yatırımlı bir menkul kıymetin faiz oranını döndürür.",
+        "Interest rate per period of an annuity, found iteratively." => {
+            "Yinelemeli olarak bulunan, bir düzenli ödemenin dönem başına faiz oranını döndürür."
+        }
+        "Internal rate of return of cash flows on specific dates." => "Belirli tarihlerdeki nakit akışlarının iç verim oranını döndürür.",
+        "Internal rate of return of periodic cash flows." => "Dönemsel nakit akışlarının iç verim oranını döndürür.",
+        "Inverse hyperbolic cosine." => "Ters hiperbolik kosinüsü döndürür.",
+        "Inverse hyperbolic cotangent." => "Ters hiperbolik kotanjantı döndürür.",
+        "Inverse hyperbolic sine." => "Ters hiperbolik sinüsü döndürür.",
+        "Inverse hyperbolic tangent." => "Ters hiperbolik tanjantı döndürür.",
+        "Inverse of a square matrix." => "Bir kare matrisin tersini döndürür.",
+        "Inverse of the Fisher transformation." => "Fisher dönüşümünün tersini döndürür.",
+        "Inverse of the cumulative beta distribution." => "Kümülatif beta dağılımının tersini döndürür.",
+        "Inverse of the cumulative lognormal distribution." => "Kümülatif lognormal dağılımın tersini döndürür.",
+        "Inverse of the gamma cumulative distribution." => "Kümülatif gama dağılımının tersini döndürür.",
+        "Inverse of the left-tailed F distribution." => "Sol kuyruklu F dağılımının tersini döndürür.",
+        "Inverse of the left-tailed chi-squared distribution." => "Sol kuyruklu ki-kare dağılımının tersini döndürür.",
+        "Inverse of the normal cumulative distribution." => "Normal kümülatif dağılımın tersini döndürür.",
+        "Inverse of the right-tailed F distribution." => "Sağ kuyruklu F dağılımının tersini döndürür.",
+        "Inverse of the right-tailed chi-squared distribution." => "Sağ kuyruklu ki-kare dağılımının tersini döndürür.",
+        "Inverse of the standard normal cumulative distribution." => "Standart normal kümülatif dağılımın tersini döndürür.",
+        "Joins several text values into one." => "Birden çok metin değerini tek bir metinde birleştirir.",
+        "Joins text from values and every cell of ranges, without a separator." => {
+            "Değerlerdeki ve aralıklardaki her hücrenin metnini ayırıcı olmadan birleştirir."
+        }
+        "Joins text from values and ranges with a delimiter, optionally skipping empty items." => {
+            "İsteğe bağlı olarak boş öğeleri atlayarak, değerlerdeki ve aralıklardaki metinleri bir ayırıcıyla birleştirir."
+        }
+        "Keeps rows or columns from the start (or end) of an array." => "Bir dizinin başından (veya sonundan) satırları ya da sütunları tutar.",
+        "Keeps the rows or columns of an array whose include flag is TRUE." => {
+            "Ekleme bayrağı DOĞRU olan dizi satırlarını veya sütunlarını filtreler."
+        }
+        "Largest number (0 when there are none)." => "En büyük sayıyı döndürür (hiç sayı yoksa 0).",
+        "Largest number in a field of the matching records." => "Eşleşen kayıtların bir alanındaki en büyük sayıyı döndürür.",
+        "Largest value among cells that meet every condition." => "Tüm koşulları karşılayan hücreler arasındaki en büyük değeri döndürür.",
+        "Largest value counting text as 0 and logicals as 1/0." => "Metni 0 ve mantıksal değerleri 1/0 sayarak en büyük değeri döndürür.",
+        "Least common multiple of integers." => "Tamsayıların en küçük ortak katını (EKOK) döndürür.",
+        "Least-squares line coefficients and optional regression statistics." => {
+            "En küçük kareler doğrusu katsayılarını ve isteğe bağlı regresyon istatistiklerini döndürür."
+        }
+        "Left-tailed inverse of Student's t distribution." => "Student t dağılımının sol kuyruklu tersini döndürür.",
+        "Length of the repeating pattern detected in a time series." => "Bir zaman serisinde algılanan yinelenen örüntünün uzunluğunu döndürür.",
+        "Logarithm to the given base (10 by default)." => "Belirtilen tabana göre (varsayılan 10) logaritmayı döndürür.",
+        "Lognormal density or probability." => "Lognormal yoğunluğu veya olasılığı döndürür.",
+        "Macaulay duration of a security with periodic interest." => "Dönemsel faizli bir menkul kıymetin Macaulay süresini döndürür.",
+        "Matches a value against a list of cases." => "Bir değeri durum listesiyle eşleştirir.",
+        "Matrix product of two arrays." => "İki dizinin matris çarpımını döndürür.",
+        "Mean after trimming a fraction of points from both ends." => {
+            "Her iki uçtan belirli bir oranda nokta kırpıldıktan sonraki ortalamayı döndürür."
+        }
+        "Mean counting text as 0 and logical values as 1 or 0." => "Metni 0 ve mantıksal değerleri 1 veya 0 sayarak ortalamayı döndürür.",
+        "Middle value of the numbers." => "Sayıların ortanca değerini döndürür.",
+        "Modified Bessel function of the first kind, I_n(x)." => "Değiştirilmiş birinci tür Bessel işlevini (I_n(x)) döndürür.",
+        "Modified Bessel function of the second kind, K_n(x)." => "Değiştirilmiş ikinci tür Bessel işlevini (K_n(x)) döndürür.",
+        "Modified duration of a security with periodic interest." => {
+            "Dönemsel faizli bir menkul kıymetin değiştirilmiş süresini (modifiye süre) döndürür."
+        }
+        "Modified internal rate of return using separate borrow and reinvest rates." => {
+            "Ayrı borçlanma ve yeniden yatırım oranları kullanarak değiştirilmiş iç verim oranını döndürür."
+        }
+        "Most frequently occurring number." => "En sık tekrarlanan sayıyı (tepe değer) döndürür.",
+        "Multiplies all the numbers in the arguments." => "Bağımsız değişkenlerdeki tüm sayıları çarpar.",
+        "Multiplies matching elements of equally sized arrays and adds the products." => {
+            "Eşit boyutlu dizilerin karşılık gelen öğelerini çarpar ve çarpımları toplar."
+        }
+        "Multiplies the numbers in a field of the matching records." => "Eşleşen kayıtların bir alanındaki sayıları çarpar.",
+        "Names intermediate results." => "Ara sonuçlara ad verir.",
+        "Natural log of the gamma function." => "Gama işlevinin doğal logaritmasını döndürür.",
+        "Natural logarithm of a complex number." => "Karmaşık bir sayının doğal logaritmasını döndürür.",
+        "Natural logarithm." => "Doğal logaritmayı döndürür.",
+        "Negative binomial probability." => "Negatif binom olasılığını döndürür.",
+        "Net present value of cash flows on specific dates." => "Belirli tarihlerdeki nakit akışlarının net bugünkü değerini döndürür.",
+        "Net present value of periodic cash flows at a discount rate." => {
+            "Bir iskonto oranında dönemsel nakit akışlarının net bugünkü değerini döndürür."
+        }
+        "Next coupon date after settlement." => "Teslim tarihinden sonraki ilk kupon tarihini döndürür.",
+        "Nominal annual rate from an effective rate and compounding periods." => {
+            "Etkin oran ve bileşik faiz dönemlerinden nominal yıllık faiz oranını döndürür."
+        }
+        "Normal distribution density or cumulative probability." => "Normal dağılım yoğunluğunu veya kümülatif olasılığını döndürür.",
+        "Number of areas in a reference." => "Bir başvurudaki alan sayısını döndürür.",
+        "Number of columns in a reference or array." => "Bir başvuru veya dizideki sütun sayısını döndürür.",
+        "Number of combinations with repetition." => "Tekrarlı kombinasyon sayısını döndürür.",
+        "Number of combinations without repetition." => "Tekrarsız kombinasyon sayısını döndürür.",
+        "Number of coupons payable between settlement and maturity." => "Teslim tarihi ile vade tarihi arasında ödenecek kupon sayısını döndürür.",
+        "Number of ordered selections with repetition." => "Tekrarlı permütasyon (sıralı seçim) sayısını döndürür.",
+        "Number of ordered selections without repetition." => "Tekrarsız permütasyon (sıralı seçim) sayısını döndürür.",
+        "Number of periods needed to pay off or accumulate an amount." => "Bir tutarı ödemek veya biriktirmek için gereken dönem sayısını döndürür.",
+        "Number of rows in a reference or array." => "Bir başvuru veya dizideki satır sayısını döndürür.",
+        "Number of sheets." => "Sayfa sayısını döndürür.",
+        "One- or two-tailed Student's t probability." => "Tek veya çift kuyruklu Student t olasılığını döndürür.",
+        "One-tailed probability of a z-test." => "Bir z-testinin tek kuyruklu olasılığını döndürür.",
+        "Pearson product-moment correlation coefficient." => "Pearson çarpım-moment korelasyon katsayısını döndürür.",
+        "Percent-encodes text for use in a URL." => "Bir URL'de kullanılmak üzere metni yüzde kodlamasıyla kodlar.",
+        "Periodic payment for a loan or annuity with constant payments and rate." => {
+            "Sabit ödemeli ve sabit oranlı bir kredi veya düzenli ödemenin dönemsel ödemesini döndürür."
+        }
+        "Periods needed for an investment to grow to a target value." => "Bir yatırımın hedef değere ulaşması için gereken dönem sayısını döndürür.",
+        "Picks a value from a list by position." => "Konuma göre bir listeden değer seçer.",
+        "Picks a value from the list by its position." => "Konumuna göre listeden bir değer seçer.",
+        "Picks columns of an array by position (negative counts from the end)." => {
+            "Konuma göre bir dizinin sütunlarını seçer (negatif sayılar sondan sayar)."
+        }
+        "Picks rows of an array by position (negative counts from the end)." => {
+            "Konuma göre bir dizinin satırlarını seçer (negatif sayılar sondan sayar)."
+        }
+        "Places arrays side by side." => "Dizileri yan yana yerleştirir.",
+        "Poisson probability." => "Poisson olasılığını döndürür.",
+        "Population covariance of paired values." => "Eşleştirilmiş değerlerin anakütle kovaryansını döndürür.",
+        "Population skewness." => "Anakütle çarpıklığını döndürür.",
+        "Population standard deviation counting text as 0 and logicals as 1/0." => {
+            "Metni 0 ve mantıksal değerleri 1/0 sayarak anakütle standart sapmasını döndürür."
+        }
+        "Population standard deviation of a field over the matching records." => {
+            "Eşleşen kayıtlar üzerinden bir alanın anakütle standart sapmasını döndürür."
+        }
+        "Population standard deviation." => "Anakütle standart sapmasını döndürür.",
+        "Population variance counting text as 0 and logicals as 1/0." => "Metni 0 ve mantıksal değerleri 1/0 sayarak anakütle varyansını döndürür.",
+        "Population variance of a field over the matching records." => "Eşleşen kayıtlar üzerinden bir alanın anakütle varyansını döndürür.",
+        "Population variance." => "Anakütle varyansını döndürür.",
+        "Positive square root." => "Pozitif karekökü döndürür.",
+        "Predicts a value along a linear trend." => "Doğrusal bir eğilim boyunca bir değeri tahmin eder.",
+        "Present value of a series of equal future payments." => "Gelecekteki eşit ödemeler serisinin bugünkü değerini döndürür.",
+        "Previous coupon date on or before settlement." => "Teslim tarihinde veya öncesindeki önceki kupon tarihini döndürür.",
+        "Price per 100 face value of a Treasury bill." => "Bir Hazine bonosunun 100 nominal değer başına fiyatını döndürür.",
+        "Price per 100 face value of a discounted security." => "İskontolu bir menkul kıymetin 100 nominal değer başına fiyatını döndürür.",
+        "Price per 100 face value of a security paying interest at maturity." => {
+            "Vade sonunda faiz ödeyen bir menkul kıymetin 100 nominal değer başına fiyatını döndürür."
+        }
+        "Price per 100 face value of a security paying periodic interest." => {
+            "Dönemsel faiz ödeyen bir menkul kıymetin 100 nominal değer başına fiyatını döndürür."
+        }
+        "Price per 100 face value of a security with an odd first period." => {
+            "Normal olmayan ilk döneme sahip bir menkul kıymetin 100 nominal değer başına fiyatını döndürür."
+        }
+        "Price per 100 face value of a security with an odd last period." => {
+            "Normal olmayan son döneme sahip bir menkul kıymetin 100 nominal değer başına fiyatını döndürür."
+        }
+        "Principal part of a given period's payment." => "Belirli bir dönem ödemesinin anapara kısmını döndürür.",
+        "Probability from Student's t-test." => "Student t-testi olasılığını döndürür.",
+        "Probability of a number of successes falling in a range." => "Belirli bir aralıkta gerçekleşen başarı sayısı olasılığını döndürür.",
+        "Probability that a standard normal value falls between the mean and z." => {
+            "Standart normal bir değerin ortalama ile z arasına düşme olasılığını döndürür."
+        }
+        "Probability that values fall between two limits." => "Değerlerin iki sınır arasına düşme olasılığını döndürür.",
+        "Product of complex numbers." => "Karmaşık sayıların çarpımını döndürür.",
+        "Quartile (0–4) of a data set, inclusive method." => "Kapsayıcı yöntemle bir veri kümesinin dörttebirliğini (0–4) döndürür.",
+        "Quartile (0–4) of a data set." => "Bir veri kümesinin dörttebirliğini (0–4) döndürür.",
+        "Quartile (1–3) of a data set, exclusive method." => "Hariç tutan yöntemle bir veri kümesinin dörttebirliğini (1–3) döndürür.",
+        "Quotient of two complex numbers." => "İki karmaşık sayının bölümünü döndürür.",
+        "Raises a complex number to a power." => "Karmaşık bir sayının üssünü alır.",
+        "Raises a number to a power." => "Bir sayının üssünü alır.",
+        "Rank of a number within a list." => "Bir sayının liste içindeki sırasını döndürür.",
+        "Rank of a number within a list; ties get the average rank." => {
+            "Bir sayının liste içindeki sırasını döndürür; eşit değerler ortalama sırayı alır."
+        }
+        "Rank of a number within a list; ties share the top rank." => {
+            "Bir sayının liste içindeki sırasını döndürür; eşit değerler en üst sırayı paylaşır."
+        }
+        "Ratio of the factorial of a sum to the product of factorials." => {
+            "Bir toplamın faktöriyelinin faktöriyellerin çarpımına oranını (multinom) döndürür."
+        }
+        "Reads text in a given base as a number." => "Belirtilen tabandaki bir metni sayı olarak okur.",
+        "Real coefficient of a complex number." => "Karmaşık bir sayının gerçek katsayısını döndürür.",
+        "Relative standing of a value as a fraction of the data set." => "Bir değerin veri kümesi içindeki göreli yüzdebirlik konumunu döndürür.",
+        "Relative standing of a value from 0 to 1 inclusive." => "0 ile 1 (dahil) arasında bir değerin göreli yüzdebirlik konumunu döndürür.",
+        "Relative standing of a value strictly between 0 and 1." => "0 ile 1 (hariç) arasında bir değerin göreli yüzdebirlik konumunu döndürür.",
+        "Remainder of a division, with the sign of the divisor." => "Bölenin işaretiyle birlikte bir bölme işleminin kalanını döndürür.",
+        "Removes leading and trailing spaces and collapses runs of spaces to one." => {
+            "Baştaki ve sondaki boşlukları kaldırır ve ardışık boşlukları tek boşluğa indirger."
+        }
+        "Removes non-printable control characters from text." => "Metindeki yazdırılamayan denetim karakterlerini kaldırır.",
+        "Removes rows or columns from the start (or end) of an array." => "Bir dizinin başından (veya sonundan) satırları ya da sütunları kaldırır.",
+        "Repeats a text a given number of times." => "Bir metni belirtilen sayıda yineler.",
+        "Replaces matches of a regular expression, all of them or a chosen occurrence." => {
+            "Bir düzenli ifadenin tüm eşleşmelerini veya seçilen bir tekrarı değiştirir."
+        }
+        "Replaces occurrences of one text with another, optionally only a given occurrence." => {
+            "Bir metnin geçişlerini başka bir metinle (isteğe bağlı olarak yalnızca belirli bir tekrarı) değiştirir."
+        }
+        "Replaces part of a text by position." => "Konuma göre bir metnin belirli bir bölümünü değiştirir.",
+        "Returns 1 when a number is at least the step, otherwise 0." => "Bir sayı en az adım değerindeyse 1, aksi halde 0 döndürür.",
+        "Returns 1 when two numbers are equal, otherwise 0." => "İki sayı eşitse 1, aksi halde 0 döndürür.",
+        "Returns a code for the kind of value: 1 number, 2 text, 4 logical, 16 error, 64 array." => {
+            "Değerin türü için bir kod döndürür: 1 sayı, 2 metin, 4 mantıksal, 16 hata, 64 dizi."
+        }
+        "Returns a fallback when a value is #N/A." => "Değer #YOK olduğunda yedek bir değer döndürür.",
+        "Returns a fallback when a value is an error." => "Değer hata olduğunda yedek bir değer döndürür.",
+        "Returns a fallback when the value is #N/A, otherwise the value." => {
+            "Değer #YOK olduğunda yedek değeri, aksi halde değerin kendisini döndürür."
+        }
+        "Returns a fallback when the value is an error, otherwise the value." => {
+            "Değer bir hata olduğunda yedek değeri, aksi halde değerin kendisini döndürür."
+        }
+        "Returns a key performance indicator property from a cube (no cube connections; #N/A)." => {
+            "Bir küpten temel performans göstergesi (KPI) özelliği döndürür (küp bağlantısı yok; #YOK)."
+        }
+        "Returns a member or tuple from a cube (no cube connections; #N/A)." => "Bir küpten üye veya demet döndürür (küp bağlantısı yok; #YOK).",
+        "Returns a property of a cube member (no cube connections; #N/A)." => "Bir küp üyesinin özelliğini döndürür (küp bağlantısı yok; #YOK).",
+        "Returns an aggregated value from a cube (no cube connections; #N/A)." => "Bir küpten toplanmış değer döndürür (küp bağlantısı yok; #YOK).",
+        "Returns characters from the middle of a text." => "Bir metnin ortasından karakterler döndürür.",
+        "Returns information about the operating environment." => "İşletim ortamı hakkında bilgi döndürür.",
+        "Returns one value if a condition is true and another if it's false." => "Bir koşul doğruysa bir değer, yanlışsa başka bir değer döndürür.",
+        "Returns one value when a condition is TRUE and another when it is FALSE." => {
+            "Bir koşul DOĞRU olduğunda bir değer, YANLIŞ olduğunda başka bir değer döndürür."
+        }
+        "Returns the #N/A error value." => "#YOK hata değerini döndürür.",
+        "Returns the 1-based position of a value in a row or column." => "Bir satır veya sütundaki bir değerin 1 tabanlı konumunu döndürür.",
+        "Returns the ISO 8601 week number of a date." => "Bir tarihin ISO 8601 hafta numarasını döndürür.",
+        "Returns the Unicode code point of the first character of a text." => "Bir metnin ilk karakterinin Unicode kod noktasını döndürür.",
+        "Returns the Windows-1252 code of the first character of a text." => "Bir metnin ilk karakterinin Windows-1252 kodunu döndürür.",
+        "Returns the character for a Unicode code point." => "Bir Unicode kod noktasına karşılık gelen karakteri döndürür.",
+        "Returns the character for a code from the Windows-1252 character set." => {
+            "Windows-1252 karakter kümesindeki bir koda karşılık gelen karakteri döndürür."
+        }
+        "Returns the current date and time." => "Geçerli tarih ve saati döndürür.",
+        "Returns the current date." => "Bugünün tarihini döndürür.",
+        "Returns the date a number of months before or after a date." => "Bir tarihten belirli sayıda ay önceki veya sonraki tarihi döndürür.",
+        "Returns the date a number of working days away with a custom weekend." => {
+            "Özel hafta sonuyla belirli sayıda iş günü sonraki veya önceki tarihi döndürür."
+        }
+        "Returns the date a number of working days before or after a date." => {
+            "Bir tarihten belirli sayıda iş günü önceki veya sonraki tarihi döndürür."
+        }
+        "Returns the day of the month of a date." => "Bir tarihin ayın kaçıncı günü olduğunu döndürür.",
+        "Returns the day of the week of a date as a number." => "Bir tarihin haftanın hangi günü olduğunu sayı olarak döndürür.",
+        "Returns the distinct rows or columns of an array." => "Bir dizinin benzersiz satırlarını veya sütunlarını döndürür.",
+        "Returns the element, row or column of an array at the given position." => {
+            "Belirtilen konumdaki dizi öğesini, satırını veya sütununu döndürür."
+        }
+        "Returns the field value of the single record that meets the criteria." => "Ölçütleri karşılayan tek kaydın alan değerini döndürür.",
+        "Returns the first characters of a text." => "Bir metnin ilk karakterlerini döndürür.",
+        "Returns the fraction of a year between two dates under a day-count basis." => {
+            "Gün sayımı temeline göre iki tarih arasındaki yıl kesrini döndürür."
+        }
+        "Returns the hour (0-23) of a time." => "Bir zamanın saatini (0-23) döndürür.",
+        "Returns the last characters of a text." => "Bir metnin son karakterlerini döndürür.",
+        "Returns the last day of the month a number of months away." => "Belirli sayıda ay önceki veya sonraki ayın son gününü döndürür.",
+        "Returns the logical value FALSE." => "YANLIŞ mantıksal değerini döndürür.",
+        "Returns the logical value TRUE." => "DOĞRU mantıksal değerini döndürür.",
+        "Returns the minute (0-59) of a time." => "Bir zamanın dakikasını (0-59) döndürür.",
+        "Returns the month (1-12) of a date." => "Bir tarihin ayını (1-12) döndürür.",
+        "Returns the nth member of a cube set (no cube connections; #N/A)." => "Bir küp kümesinin n. üyesini döndürür (küp bağlantısı yok; #YOK).",
+        "Returns the number identifying an error value, or #N/A if it is not an error." => {
+            "Bir hata değerini tanımlayan sayıyı, hata değilse #YOK değerini döndürür."
+        }
+        "Returns the number of days between two dates." => "İki tarih arasındaki gün sayısını döndürür.",
+        "Returns the phonetic (furigana) text; here the text itself." => "Fonetik (furigana) metni döndürür; burada metnin kendisini döndürür.",
+        "Returns the position of a value in a row or column with flexible match and search modes." => {
+            "Esnek eşleştirme ve arama modlarıyla bir satır veya sütundaki değerin konumunu döndürür."
+        }
+        "Returns the second (0-59) of a time." => "Bir zamanın saniyesini (0-59) döndürür.",
+        "Returns the text that comes after a delimiter." => "Bir ayırıcıdan sonra gelen metni döndürür.",
+        "Returns the text that comes before a delimiter." => "Bir ayırıcıdan önce gelen metni döndürür.",
+        "Returns the value if it is text, otherwise empty text." => "Değer metinse kendisini, aksi halde boş metin döndürür.",
+        "Returns the value of the first true condition." => "İlk doğru koşulun değerini döndürür.",
+        "Returns the value paired with the first condition that is TRUE." => "DOĞRU olan ilk koşulla eşleştirilmiş değeri döndürür.",
+        "Returns the week number of a date within its year." => "Bir tarihin yıl içindeki hafta numarasını döndürür.",
+        "Returns the year of a date." => "Bir tarihin yılını döndürür.",
+        "Reverses a logical value." => "Mantıksal bir değerin tersini alır.",
+        "Right-tailed F probability." => "Sağ kuyruklu F olasılığını döndürür.",
+        "Right-tailed Student's t probability." => "Sağ kuyruklu Student t olasılığını döndürür.",
+        "Right-tailed chi-squared probability." => "Sağ kuyruklu ki-kare olasılığını döndürür.",
+        "Rounds a number and formats it as text with fixed decimals and optional thousands separators." => {
+            "Bir sayıyı yuvarlar ve sabit ondalık basamaklarla (ve isteğe bağlı binlik ayırıcılarla) metin olarak biçimlendirir."
+        }
+        "Rounds a number away from zero to a given number of digits." => "Bir sayıyı sıfırdan uzağa doğru belirtilen basamak sayısına yuvarlar.",
+        "Rounds a number down to a multiple of significance." => "Bir sayıyı anlamlılık katına doğru aşağı yuvarlar.",
+        "Rounds a number down to the nearest integer or multiple." => "Bir sayıyı en yakın tamsayıya veya kata doğru aşağı yuvarlar.",
+        "Rounds a number down to the nearest integer." => "Bir sayıyı en yakın daha küçük tamsayıya aşağı yuvarlar.",
+        "Rounds a number to a given number of digits, halves away from zero." => "Bir sayıyı belirtilen basamak sayısına yuvarlar.",
+        "Rounds a number to the nearest multiple." => "Bir sayıyı en yakın kata yuvarlar.",
+        "Rounds a number toward negative infinity to a multiple." => "Bir sayıyı negatif sonsuza doğru bir kata yuvarlar.",
+        "Rounds a number toward positive infinity to a multiple." => "Bir sayıyı pozitif sonsuza doğru bir kata yuvarlar.",
+        "Rounds a number toward zero to a given number of digits." => "Bir sayıyı sıfıra doğru belirtilen basamak sayısına yuvarlar.",
+        "Rounds a number up to a multiple of significance." => "Bir sayıyı anlamlılık katına doğru yukarı yuvarlar.",
+        "Rounds a number up to the nearest integer or multiple." => "Bir sayıyı en yakın tamsayıya veya kata doğru yukarı yuvarlar.",
+        "Rounds away from zero to the nearest even integer." => "Sıfırdan uzağa doğru en yakın çift tamsayıya yuvarlar.",
+        "Rounds away from zero to the nearest odd integer." => "Sıfırdan uzağa doğru en yakın tek tamsayıya yuvarlar.",
+        "Row number of a reference." => "Bir başvurunun satır numarasını döndürür.",
+        "Running accumulation of an array." => "Bir dizinin kümülatif birikimini döndürür.",
+        "Sample covariance of paired values." => "Eşleştirilmiş değerlerin örneklem kovaryansını döndürür.",
+        "Sample skewness." => "Örneklem çarpıklığını döndürür.",
+        "Sample standard deviation counting text as 0 and logicals as 1/0." => {
+            "Metni 0 ve mantıksal değerleri 1/0 sayarak örneklem standart sapmasını döndürür."
+        }
+        "Sample standard deviation of a field over the matching records." => {
+            "Eşleşen kayıtlar üzerinden bir alanın örneklem standart sapmasını döndürür."
+        }
+        "Sample standard deviation." => "Örneklem standart sapmasını döndürür.",
+        "Sample variance counting text as 0 and logicals as 1/0." => "Metni 0 ve mantıksal değerleri 1/0 sayarak örneklem varyansını döndürür.",
+        "Sample variance of a field over the matching records." => "Eşleşen kayıtlar üzerinden bir alanın örneklem varyansını döndürür.",
+        "Sample variance." => "Örneklem varyansını döndürür.",
+        "Searches a row or column and returns the matching item, row or column from another array." => {
+            "Bir satır veya sütunda arama yapar ve başka bir diziden eşleşen öğeyi, satırı veya sütunu döndürür."
+        }
+        "Secant of a complex number." => "Karmaşık bir sayının sekantını döndürür.",
+        "Secant of an angle in radians." => "Radyan cinsinden bir açının sekantını döndürür.",
+        "Sheet number." => "Sayfa numarasını döndürür.",
+        "Shifts the bits of a number left (right for negative shifts)." => "Bir sayının bitlerini sola kaydırır (negatif değerlerde sağa).",
+        "Shifts the bits of a number right (left for negative shifts)." => "Bir sayının bitlerini sağa kaydırır (negatif değerlerde sola).",
+        "Sine of a complex number." => "Karmaşık bir sayının sinüsünü döndürür.",
+        "Sine of an angle in radians." => "Radyan cinsinden bir açının sinüsünü döndürür.",
+        "Slope of the least-squares regression line." => "En küçük kareler regresyon doğrusunun eğimini döndürür.",
+        "Smallest number (0 when there are none)." => "En küçük sayıyı döndürür (hiç sayı yoksa 0).",
+        "Smallest number in a field of the matching records." => "Eşleşen kayıtların bir alanındaki en küçük sayıyı döndürür.",
+        "Smallest success count whose cumulative binomial probability reaches alpha." => {
+            "Kümülatif binom olasılığı alfaya ulaşan en küçük başarı sayısını döndürür."
+        }
+        "Smallest value among cells that meet every condition." => "Tüm koşulları karşılayan hücreler arasındaki en küçük değeri döndürür.",
+        "Smallest value counting text as 0 and logicals as 1/0." => "Metni 0 ve mantıksal değerleri 1/0 sayarak en küçük değeri döndürür.",
+        "Sorts an array by the values of other arrays of matching size." => "Bir diziyi eşleşen boyuttaki diğer dizilerin değerlerine göre sıralar.",
+        "Sorts the rows (or columns) of an array by one or more of its columns." => {
+            "Bir dizinin satırlarını (veya sütunlarını) bir ya da daha fazla sütununa göre sıralar."
+        }
+        "Spells out a number in Thai words with Baht." => "Bir sayıyı Baht para birimiyle Tayca sözcüklerle yazar.",
+        "Splits text into a grid of columns and rows at the given delimiters." => "Metni belirtilen ayırıcılardan sütun ve satır ızgarasına böler.",
+        "Square of the correlation coefficient." => "Korelasyon katsayısının karesini (R-kare) döndürür.",
+        "Square root of a complex number." => "Karmaşık bir sayının karekökünü döndürür.",
+        "Square root of the number times pi." => "Sayı ile pi çarpımının karekökünü döndürür.",
+        "Stacks arrays on top of each other." => "Dizileri üst üste yığar.",
+        "Standard error of predicted y values in a regression." => "Bir regresyonda tahmin edilen y değerlerinin standart hatasını döndürür.",
+        "Standard normal cumulative probability." => "Standart normal kümülatif olasılığı döndürür.",
+        "Standard normal density or cumulative probability." => "Standart normal yoğunluğu veya kümülatif olasılığı döndürür.",
+        "Standard normal density." => "Standart normal yoğunluğu döndürür.",
+        "Straight-line depreciation for one period." => "Bir dönem için doğrusal amortismanı döndürür.",
+        "Student's t density or left-tailed probability." => "Student t yoğunluğunu veya sol kuyruklu olasılığını döndürür.",
+        "Sum of a power series." => "Bir kuvvet serisinin toplamını döndürür.",
+        "Sum of complex numbers." => "Karmaşık sayıların toplamını döndürür.",
+        "Sum of squared deviations from the mean." => "Ortalamadan sapmaların kareleri toplamını döndürür.",
+        "Sum-of-years'-digits depreciation for a period." => "Bir dönem için yılın rakamları toplamı amortismanını döndürür.",
+        "Sums the differences of squares of matching elements." => "Eşleşen öğelerin karelerinin farklarını toplar.",
+        "Sums the squared differences of matching elements." => "Eşleşen öğelerin farklarının karelerini toplar.",
+        "Sums the sums of squares of matching elements." => "Eşleşen öğelerin karelerinin toplamlarını toplar.",
+        "Swaps the rows and columns of an array." => "Bir dizinin satırlarını ve sütunlarını yer değiştirir (devrik matris).",
+        "TRUE for references." => "Başvurular için DOĞRU döndürür.",
+        "TRUE when a LAMBDA argument was left out." => "Bir LAMBDA bağımsız değişkeni atlandığında DOĞRU döndürür.",
+        "TRUE when a regular expression matches somewhere in the text." => {
+            "Bir düzenli ifade metnin herhangi bir yerinde eşleştiğinde DOĞRU döndürür."
+        }
+        "TRUE when an odd number of arguments are TRUE." => "Tek sayıda bağımsız değişken DOĞRU olduğunda DOĞRU döndürür.",
+        "TRUE when at least one argument is TRUE." => "En az bir bağımsız değişken DOĞRU olduğunda DOĞRU döndürür.",
+        "TRUE when every argument is TRUE." => "Tüm bağımsız değişkenler DOĞRU olduğunda DOĞRU döndürür.",
+        "TRUE when the cell has a formula." => "Hücrede bir formül olduğunda DOĞRU döndürür.",
+        "TRUE when the integer part of a number is even." => "Bir sayının tamsayı kısmı çift olduğunda DOĞRU döndürür.",
+        "TRUE when the integer part of a number is odd." => "Bir sayının tamsayı kısmı tek olduğunda DOĞRU döndürür.",
+        "TRUE when the value is TRUE or FALSE." => "Değer DOĞRU veya YANLIŞ olduğunda DOĞRU döndürür.",
+        "TRUE when the value is a number." => "Değer bir sayı olduğunda DOĞRU döndürür.",
+        "TRUE when the value is any error other than #N/A." => "Değer #YOK dışında herhangi bir hata olduğunda DOĞRU döndürür.",
+        "TRUE when the value is any error." => "Değer herhangi bir hata olduğunda DOĞRU döndürür.",
+        "TRUE when the value is anything other than text." => "Değer metin dışında bir şey olduğunda DOĞRU döndürür.",
+        "TRUE when the value is text." => "Değer bir metin olduğunda DOĞRU döndürür.",
+        "TRUE when the value is the #N/A error." => "Değer #YOK hatası olduğunda DOĞRU döndürür.",
+        "TRUE when the value refers to an empty cell." => "Değer boş bir hücreye başvurduğunda DOĞRU döndürür.",
+        "TRUE when two texts are identical, including case." => "Büyük/küçük harf dahil iki metin birebir aynı olduğunda DOĞRU döndürür.",
+        "Tangent of a complex number." => "Karmaşık bir sayının tanjantını döndürür.",
+        "Tangent of an angle in radians." => "Radyan cinsinden bir açının tanjantını döndürür.",
+        "The constant pi to 15 digits." => "15 basamak duyarlılıkla pi sabitini döndürür.",
+        "The formula of a cell as text." => "Bir hücrenin formülünü metin olarak döndürür.",
+        "The gamma function." => "Gama işlevini döndürür.",
+        "The k-th largest number in a data set." => "Bir veri kümesindeki k. en büyük sayıyı döndürür.",
+        "The k-th smallest number in a data set." => "Bir veri kümesindeki k. en küçük sayıyı döndürür.",
+        "The reference named by a text string." => "Bir metin dizesiyle belirtilen başvuruyu döndürür.",
+        "The sum of a subset as a fraction of the sum of all the values." => "Bir alt küme toplamının tüm değerlerin toplamına oranını döndürür.",
+        "The value or reference at a position." => "Belirli bir konumdaki değeri veya başvuruyu döndürür.",
+        "Total interest paid between two periods." => "İki dönem arasında ödenen toplam faizi döndürür.",
+        "Total principal repaid between two periods." => "İki dönem arasında geri ödenen toplam anaparayı döndürür.",
+        "Two-tailed Student's t probability." => "Çift kuyruklu Student t olasılığını döndürür.",
+        "Two-tailed inverse of Student's t distribution." => "Student t dağılımının çift kuyruklu tersini döndürür.",
+        "Two-tailed probability that two variances do not differ." => "İki varyansın farklılık göstermemesi için çift kuyruklu olasılığı döndürür.",
+        "Values along a fitted exponential growth curve." => "Uydurulmuş bir üstel büyüme eğrisi boyunca değerleri döndürür.",
+        "Values along a least-squares linear fit." => "En küçük kareler doğrusal uyumu boyunca değerleri döndürür.",
+        "Vertical array of all the most frequent numbers." => "En sık tekrarlanan tüm sayıların dikey dizisini döndürür.",
+        "Weibull density or probability." => "Weibull yoğunluğunu veya olasılığını döndürür.",
+        "Writes a number in another base, padded with zeros." => "Bir sayıyı sıfırlarla doldurulmuş olarak başka bir tabanda yazar.",
+        "Y-intercept of the least-squares regression line." => "En küçük kareler regresyon doğrusunun y ekseni kesişim noktasını döndürür.",
+        "Yield of a Treasury bill." => "Bir Hazine bonosunun getirisini döndürür.",
+        "Yield of a security paying periodic interest." => "Dönemsel faiz ödeyen bir menkul kıymetin getirisini döndürür.",
+        "Yield of a security with an odd first period." => "Normal olmayan ilk döneme sahip bir menkul kıymetin getirisini döndürür.",
+        "Yield of a security with an odd last period." => "Normal olmayan son döneme sahip bir menkul kıymetin getirisini döndürür.",
+        "Z-score of a value." => "Bir değerin standartlaştırılmış Z-puanını döndürür.",
+        "e raised to the given power." => "e sayısının belirtilen kuvvete yükseltilmiş değerini döndürür.",
+        "k-th percentile, k from 0 to 1 inclusive." => "0 ile 1 (dahil) arasındaki k için k. yüzdebirliği döndürür.",
+        "k-th percentile, k strictly between 0 and 1." => "0 ile 1 (hariç) arasındaki k için k. yüzdebirliği döndürür.",
+
         _ => return None,
     })
 }
